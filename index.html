@@ -587,7 +587,7 @@
                     } else {
                         if (isLocked) {
                             // 锁仓中
-                            statusHtml = '<span class="text-danger">锁仓中</span>';
+                            statusHtml = '<span class="text-danger">正在锁仓</span>';
                             actionHtml = `<button class="btn btn-sm btn-secondary" disabled>等待解锁</button>`;
                             
                             // 创建倒计时显示元素
@@ -597,8 +597,8 @@
                             startCountdown(i, timeRemaining);
                         } else if (isUnlocked) {
                             // 可赎回
-                            statusHtml = '<span class="text-success">可赎回</span>';
-                            actionHtml = `<button class="btn btn-sm btn-warning" id="unstake-btn-${i}" onclick="handleUnstake(${i})">赎回</button>`;
+                            statusHtml = '<span class="text-success">可以赎回</span>';
+                            actionHtml = `<button class="btn btn-sm btn-warning" id="unstake-btn-${i}" onclick="handleUnstake(${i})">立即赎回</button>`;
                             timeRemainingHtml = '<span class="countdown countdown-unlocked">已解锁</span>';
                         } else {
                             statusHtml = '<span class="text-warning">未知</span>';
