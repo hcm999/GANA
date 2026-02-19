@@ -419,17 +419,7 @@
             return "0.00";
         }
     }
-    
-    // 为质押记录创建专用的格式化函数（无小数）
-    function formatAmountNoDecimals(wei) {
-        try {
-            const val = ethers.formatUnits(wei, 18);
-            return Math.floor(parseFloat(val)).toString();
-        } catch (e) {
-            return "0";
-        }
-    }
-    
+
     // 格式化时间：将秒转换为天、小时、分钟
     function formatTimeRemaining(seconds) {
         if (seconds <= 0) return "0秒";
@@ -570,7 +560,7 @@
                 try {
                     const record = await stakingContract.userStakeRecord(userAddress, i);
                     
-                    const amount = formatAmountNoDecimals(record[1]); 
+                    const amount = formatAmountTwoDecimals(record[1]); 
                     const stakeTime = Number(record[0]);
                     const stakeTimeStr = formatStakeTime(stakeTime);
                     const isActive = record[2]; 
@@ -917,7 +907,7 @@
         
         pageData.forEach((record, index) => {
             const globalIndex = startIndex + index;
-            const amount = formatAmountNoDecimals(record.amount);
+            const amount = formatAmountTwoDecimals(record.amount);
             const stakeTimeStr = formatStakeTime(record.stakeTime);
             const durationLabel = STAKE_DURATION_LABELS[record.stakeIndex] || "未知";
             const status = record.isActive ? "已提取" : "质押中";
