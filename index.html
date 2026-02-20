@@ -35,16 +35,16 @@
         input.form-control { background-color: #334155; border-color: #475569; color: white; }
         input.form-control:focus { background-color: #334155; color: white; border-color: #38bdf8; box-shadow: none; }
         
-        /* 修改：质押按钮组 - 防止30天换行 */
+        /* 质押按钮组 - 防止30天换行 */
         .staking-btn-group { 
             display: flex; 
             gap: 10px; 
-            flex-wrap: nowrap; /* 改为nowrap防止换行 */
+            flex-wrap: nowrap;
         }
         .staking-btn-group .btn { 
             flex: 1; 
-            min-width: 100px; /* 稍微减小最小宽度 */
-            white-space: nowrap; /* 文字不换行 */
+            min-width: 100px;
+            white-space: nowrap;
             font-size: 0.9rem;
             padding: 0.5rem 0.25rem;
         }
@@ -62,27 +62,22 @@
         .countdown-unlocked { color: #34d399; }
         .align-items-end label.form-label { color: wheat; }
         
-        /* 调整表格中特定列的字体大小 */
         .stake-time-cell { font-size: 0.8rem; }
         .remaining-time-cell { font-size: 0.8rem; }
         .status-cell { font-size: 0.8rem; }
         .action-cell { font-size: 0.8rem; }
         
-        /* 调整ID和金额列的字体大小 */
-        .table td:first-child { font-size: 0.85rem; } /* ID列 */
-        .table td:nth-child(2) { font-size: 0.85rem; } /* 金额列 */
+        .table td:first-child { font-size: 0.85rem; }
+        .table td:nth-child(2) { font-size: 0.85rem; }
         
-        /* 调整表格行高 */
         .table tbody tr { height: 40px; }
         
-        /* 调整操作按钮大小 */
         .action-cell .btn-sm { 
             padding: 0.15rem 0.4rem; 
             font-size: 0.75rem; 
             line-height: 1.2;
         }
         
-        /* 选项卡样式 */
         .nav-tabs { border-bottom: 1px solid #334155; }
         .nav-tabs .nav-link { 
             color: #94a3b8; 
@@ -100,7 +95,6 @@
         }
         .tab-content { padding-top: 1rem; }
         
-        /* 我的质押记录子选项卡样式 */
         .sub-tabs {
             display: flex;
             gap: 10px;
@@ -147,14 +141,12 @@
             margin: 5px 0;
         }
         
-        /* 新增样式：记录缓存状态提示 */
         .cache-status {
             font-size: 0.7rem;
             color: #6b7280;
             margin-left: 10px;
         }
         
-        /* 新增样式：记录项高亮 */
         @keyframes highlight {
             0% { background-color: #3b82f6; }
             100% { background-color: transparent; }
@@ -163,7 +155,16 @@
             animation: highlight 1s ease-out;
         }
         
-        /* 移动端适配 */
+        .loading-progress {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #1e293b;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            color: #38bdf8;
+            text-align: center;
+        }
+        
         @media (max-width: 768px) {
             .staking-btn-group .btn { 
                 min-width: 80px;
@@ -344,6 +345,9 @@
                         </div>
                     </div>
                     
+                    <!-- 加载进度提示 -->
+                    <div id="loadingProgress" class="loading-progress" style="display: none;"></div>
+                    
                     <!-- 总质押列表 -->
                     <div class="table-responsive">
                         <table class="table table-hover">
@@ -433,7 +437,7 @@
     let pendingUpdates = new Set();
     let currentFilter = 'all';
 
-    // 工具：格式化金额为整数（无小数位）- 用于我的质押记录
+    // 工具：格式化金额为整数（无小数位）
     function formatAmountInteger(wei) {
         try {
             const val = ethers.formatUnits(wei, 18);
@@ -471,7 +475,7 @@
         return result || "0秒";
     }
     
-    // 格式化质押时间：显示更简洁的时间格式
+    // 格式化质押时间
     function formatStakeTime(timestamp) {
         try {
             const date = new Date(timestamp * 1000);
@@ -546,7 +550,7 @@
         }
     }
 
-    // 更新单条记录 - 修改：使用整数金额
+    // 更新单条记录
     async function updateSingleRecord(index) {
         if (!userAddress || !stakingContract) return null;
         
@@ -554,7 +558,7 @@
             const record = await stakingContract.userStakeRecord(userAddress, index);
             
             const now = Math.floor(Date.now() / 1000);
-            const amount = formatAmountInteger(record[1]); // 改为整数
+            const amount = formatAmountInteger(record[1]);
             const stakeTime = Number(record[0]);
             const isActive = record[2];
             const stakeIndex = Number(record[3]);
@@ -625,7 +629,7 @@
         renderStakeListFromCache();
     }
 
-    // 从缓存渲染列表（支持筛选）- 金额已经是整数
+    // 从缓存渲染列表
     function renderStakeListFromCache() {
         const tbody = document.getElementById('stakeListBody');
         if (!tbody) return;
@@ -895,7 +899,7 @@
         countdownTimers[id] = timer;
     }
 
-    // ========== 修复：全网质押记录刷新函数 ==========
+    // ========== 全网质押记录刷新函数（分批次获取全部历史数据） ==========
     async function refreshAllStakeData() {
         if (!stakingContract) {
             alert("请先连接钱包");
@@ -910,49 +914,96 @@
         btn.innerText = "加载中...";
         isLoadingAllData = true;
         
+        // 显示加载进度
+        const progressEl = document.getElementById('loadingProgress');
+        if (progressEl) progressEl.style.display = 'block';
+        
         try {
             allStakeData = [];
             
-            console.log("开始获取全网质押记录...");
+            // 获取当前区块高度
+            const currentBlock = await provider.getBlockNumber();
+            console.log("当前区块高度:", currentBlock);
             
-            // 从Staked事件获取所有记录
-            const filter = stakingContract.filters.Staked();
-            const events = await stakingContract.queryFilter(filter, 0, 'latest');
+            // 分批次获取事件（每批 5000 个区块）
+            const BATCH_SIZE = 5000;
+            let fromBlock = 0;
+            let toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
+            let totalEvents = 0;
+            let batchCount = 0;
             
-            console.log(`找到 ${events.length} 条质押事件`);
+            // 计算总批次数
+            const totalBatches = Math.ceil((currentBlock + 1) / BATCH_SIZE);
             
-            // 处理每个事件
-            for (const event of events) {
+            while (fromBlock <= currentBlock) {
+                batchCount++;
+                const progress = Math.round((batchCount / totalBatches) * 100);
+                
+                // 更新进度提示
+                if (progressEl) {
+                    progressEl.innerHTML = `正在加载历史数据... ${progress}% (第 ${batchCount}/${totalBatches} 批)`;
+                }
+                
+                console.log(`查询区块 ${fromBlock} 到 ${toBlock} (批次 ${batchCount}/${totalBatches})`);
+                
                 try {
-                    // 事件参数顺序：
-                    // args[0]: amount, args[1]: user, args[2]: index, args[3]: stakeTime
-                    const amount = event.args[0];
-                    const user = event.args[1];
-                    const stakeIndex = Number(event.args[2]);
-                    const stakeTime = Number(event.args[3]);
+                    const filter = stakingContract.filters.Staked();
+                    const events = await stakingContract.queryFilter(filter, fromBlock, toBlock);
                     
-                    // 获取这笔质押的当前状态
-                    let isActive = true; // 默认为活跃（未赎回）
-                    try {
-                        // 注意：record[2] 是 status，true=已赎回，false=活跃
-                        const record = await stakingContract.userStakeRecord(user, stakeIndex);
-                        isActive = record[2]; // true=已赎回, false=活跃
-                    } catch (e) {
-                        console.log(`获取记录状态失败: ${user}, ${stakeIndex}`);
+                    console.log(`找到 ${events.length} 条事件`);
+                    totalEvents += events.length;
+                    
+                    // 处理这一批次的事件
+                    for (const event of events) {
+                        try {
+                            // 事件参数顺序：
+                            // args[0]: amount, args[1]: user, args[2]: index, args[3]: stakeTime
+                            const amount = event.args[0];
+                            const user = event.args[1];
+                            const stakeIndex = Number(event.args[2]);
+                            const stakeTime = Number(event.args[3]);
+                            
+                            // 获取这笔质押的当前状态
+                            let isActive = true; // 默认为活跃（未赎回）
+                            try {
+                                const record = await stakingContract.userStakeRecord(user, stakeIndex);
+                                isActive = record[2]; // true=已赎回, false=活跃
+                            } catch (e) {
+                                console.log(`获取记录状态失败: ${user}, ${stakeIndex}`);
+                            }
+                            
+                            allStakeData.push({
+                                userAddress: user,
+                                amount: amount,
+                                stakeTime: stakeTime,
+                                isActive: isActive,
+                                stakeIndex: stakeIndex
+                            });
+                            
+                        } catch (eventError) {
+                            console.error("处理事件失败:", eventError);
+                        }
                     }
                     
-                    allStakeData.push({
-                        userAddress: user,
-                        amount: amount,
-                        stakeTime: stakeTime,
-                        isActive: isActive,
-                        stakeIndex: stakeIndex
-                    });
+                    // 更新区块范围
+                    fromBlock = toBlock + 1;
+                    toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
                     
-                } catch (eventError) {
-                    console.error("处理事件失败:", eventError);
+                    // 稍微延迟一下，避免请求太频繁
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    
+                } catch (batchError) {
+                    console.error(`批次查询失败 (${fromBlock}-${toBlock}):`, batchError);
+                    // 如果这一批失败，用更小的批次重试
+                    await retryBatchWithSmallerSize(fromBlock, toBlock, progressEl);
+                    
+                    // 更新区块范围
+                    fromBlock = toBlock + 1;
+                    toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
                 }
             }
+            
+            console.log(`总共找到 ${totalEvents} 条事件`);
             
             // 按质押时间倒序排序
             allStakeData.sort((a, b) => b.stakeTime - a.stakeTime);
@@ -966,11 +1017,25 @@
             updatePagination();
             
             console.log(`全网质押记录加载完成，共 ${allStakeData.length} 条`);
+            
+            if (progressEl) {
+                progressEl.innerHTML = `加载完成！共 ${allStakeData.length} 条记录`;
+                setTimeout(() => {
+                    progressEl.style.display = 'none';
+                }, 3000);
+            }
+            
             btn.innerText = "刷新成功";
             
         } catch (error) {
             console.error("获取全网质押数据失败:", error);
             btn.innerText = "刷新失败";
+            
+            if (progressEl) {
+                progressEl.innerHTML = '加载失败，请重试';
+                progressEl.style.color = '#ef4444';
+            }
+            
             alert("刷新失败: " + (error.message || error));
         } finally {
             setTimeout(() => {
@@ -978,6 +1043,61 @@
                 btn.innerText = originalText;
                 isLoadingAllData = false;
             }, 2000);
+        }
+    }
+
+    // 辅助函数：用更小的批次重试
+    async function retryBatchWithSmallerSize(fromBlock, toBlock, progressEl) {
+        const SMALL_BATCH = 1000;
+        let smallFrom = fromBlock;
+        let smallTo = Math.min(smallFrom + SMALL_BATCH - 1, toBlock);
+        let retryCount = 0;
+        
+        while (smallFrom <= toBlock) {
+            retryCount++;
+            
+            if (progressEl) {
+                progressEl.innerHTML = `重试中... 区块 ${smallFrom}-${smallTo}`;
+            }
+            
+            console.log(`重试小批次 ${smallFrom} 到 ${smallTo}...`);
+            
+            try {
+                const filter = stakingContract.filters.Staked();
+                const events = await stakingContract.queryFilter(filter, smallFrom, smallTo);
+                
+                for (const event of events) {
+                    try {
+                        const amount = event.args[0];
+                        const user = event.args[1];
+                        const stakeIndex = Number(event.args[2]);
+                        const stakeTime = Number(event.args[3]);
+                        
+                        let isActive = true;
+                        try {
+                            const record = await stakingContract.userStakeRecord(user, stakeIndex);
+                            isActive = record[2];
+                        } catch (e) {}
+                        
+                        allStakeData.push({
+                            userAddress: user,
+                            amount: amount,
+                            stakeTime: stakeTime,
+                            isActive: isActive,
+                            stakeIndex: stakeIndex
+                        });
+                        
+                    } catch (eventError) {}
+                }
+                
+            } catch (error) {
+                console.error(`小批次重试失败:`, error);
+                throw error;
+            }
+            
+            smallFrom = smallTo + 1;
+            smallTo = Math.min(smallFrom + SMALL_BATCH - 1, toBlock);
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
     }
     
@@ -1025,7 +1145,7 @@
         
         pageData.forEach((record, index) => {
             const globalIndex = startIndex + index + 1;
-            const amount = formatAmountInteger(record.amount); // 改为整数
+            const amount = formatAmountInteger(record.amount);
             const stakeTimeStr = formatStakeTime(record.stakeTime);
             const durationLabel = STAKE_DURATION_LABELS[record.stakeIndex] || "未知";
             const status = record.isActive ? "已提取" : "质押中";
