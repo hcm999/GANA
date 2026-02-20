@@ -30,7 +30,7 @@
         .stat-value { font-size: 1.25rem; font-weight: bold; color: #38bdf8; }
         .stat-label { font-size: 0.85rem; color: #94a3b8; }
         
-        /* 表格样式优化 - 减小列间距 */
+        /* 表格样式优化 */
         .table { 
             color: #cbd5e1; 
             font-size: 0.9rem; 
@@ -53,49 +53,88 @@
             word-break: break-word;
         }
 
-        /* 列宽设置 */
-        .table th:nth-child(1), .table td:nth-child(1) { width: 5%; }
-        .table th:nth-child(2), .table td:nth-child(2) { width: 8%; }
-        .table th:nth-child(3), .table td:nth-child(3) { width: 8%; }
-        .table th:nth-child(4), .table td:nth-child(4) { width: 30%; }
-        .table th:nth-child(5), .table td:nth-child(5) { width: 22%; }
-        .table th:nth-child(6), .table td:nth-child(6) { width: 10%; }
-        .table th:nth-child(7), .table td:nth-child(7) { width: 17%; }
+        /* 列宽设置 - 优化版 */
+        .table th:nth-child(1), .table td:nth-child(1) { width: 6%; }  /* ID列 - 加宽一点放#标签 */
+        .table th:nth-child(2), .table td:nth-child(2) { width: 8%; }  /* 金额列 */
+        .table th:nth-child(3), .table td:nth-child(3) { width: 10%; } /* 周期列 - 加宽避免换行 */
+        .table th:nth-child(4), .table td:nth-child(4) { width: 28%; } /* 质押时间 - 分两行 */
+        .table th:nth-child(5), .table td:nth-child(5) { width: 22%; } /* 剩余时间 */
+        .table th:nth-child(6), .table td:nth-child(6) { width: 10%; } /* 状态列 */
+        .table th:nth-child(7), .table td:nth-child(7) { width: 16%; } /* 操作列 */
 
-        /* 特定列左对齐 */
-        .table td:nth-child(4),
-        .table td:nth-child(5) {
-            text-align: left;
+        /* ID标签样式 */
+        .id-label {
+            display: inline-block;
+            background-color: #374151;
+            color: #9ca3af;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+        
+        .id-value {
+            font-weight: bold;
+            color: #60a5fa;
         }
 
-        input.form-control { background-color: #334155; border-color: #475569; color: white; }
-        input.form-control:focus { background-color: #334155; color: white; border-color: #38bdf8; box-shadow: none; }
-        .staking-btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .staking-btn-group .btn { flex: 1; min-width: 120px; }
-        .badge-duration { background-color: #374151; color: #9ca3af; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; }
+        /* 周期标签 - 确保不换行 */
+        .badge-duration { 
+            background-color: #374151; 
+            color: #9ca3af; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-size: 0.75rem;
+            white-space: nowrap;
+            display: inline-block;
+            font-weight: 500;
+        }
+        
+        /* 时间双行显示 */
+        .time-two-lines {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.4;
+        }
+        .time-date {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        .time-clock {
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace;
+            font-weight: 500;
+            color: #38bdf8;
+        }
+        
+        /* 剩余时间样式 */
         .countdown { 
             font-family: 'Courier New', monospace; 
             background-color: #1f2937; 
             padding: 2px 6px; 
             border-radius: 3px; 
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             display: inline-block;
+            white-space: nowrap;
         }
         .countdown-locked { color: #f87171; }
         .countdown-unlocked { color: #34d399; }
+        
+        input.form-control { background-color: #334155; border-color: #475569; color: white; }
+        input.form-control:focus { background-color: #334155; color: white; border-color: #38bdf8; box-shadow: none; }
+        .staking-btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .staking-btn-group .btn { flex: 1; min-width: 120px; }
+        
         .align-items-end label.form-label { color: wheat; }
         
         /* 调整表格中特定列的字体大小 */
         .stake-time-cell { 
-            font-size: 0.9rem;
             white-space: normal; 
-            font-family: 'Courier New', monospace; 
-            font-weight: 500;
         }
         .remaining-time-cell { 
-            font-size: 0.85rem; 
+            font-size: 0.8rem; 
             white-space: normal; 
-            font-family: 'Courier New', monospace; 
         }
         .status-cell { 
             font-size: 0.8rem; 
@@ -109,12 +148,11 @@
             word-break: break-word;
         }
         
-        /* 调整ID和金额列的字体大小 */
-        .table td:first-child { 
-            font-size: 0.8rem; 
-        }
+        /* 调整金额列字体 */
         .table td:nth-child(2) { 
-            font-size: 0.8rem; 
+            font-size: 0.85rem; 
+            font-family: 'Courier New', monospace;
+            font-weight: 500;
         }
         
         /* 状态标签样式 */
@@ -134,7 +172,7 @@
             word-break: break-word;
             max-width: 100%;
             height: auto;
-            min-height: 24px;
+            min-height: 28px;
         }
         
         /* 已提取状态的特殊样式 */
@@ -146,7 +184,7 @@
         }
         
         /* 调整表格行高 */
-        .table tbody tr { height: auto; min-height: 40px; }
+        .table tbody tr { height: auto; min-height: 50px; }
         
         /* 选项卡样式 */
         .nav-tabs { border-bottom: 1px solid #334155; }
@@ -544,23 +582,28 @@
         return result;
     }
     
-    // 显示到秒
-    function formatStakeTime(timestamp) {
+    // 修改：返回日期和时间分开
+    function formatStakeTimeSplit(timestamp) {
         try {
             const date = new Date(timestamp * 1000);
             const now = new Date();
             const diffMs = now - date;
             const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            let dateStr = '';
             if (diffDays === 0) {
-                return '今天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                dateStr = '今天';
             } else if (diffDays === 1) {
-                return '昨天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                dateStr = '昨天';
             } else {
-                return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) + ' ' + 
-                       date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                dateStr = date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
             }
+            
+            const timeStr = date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            return { date: dateStr, time: timeStr };
         } catch (e) {
-            return "时间错误";
+            return { date: "错误", time: "错误" };
         }
     }
     
@@ -679,7 +722,7 @@
             const isLocked = record.timeRemaining > 0 && !record.isActive;
             const isUnlocked = record.timeRemaining <= 0 && !record.isActive;
             const durationLabel = STAKE_DURATION_LABELS[record.stakeIndex] || "未知";
-            const stakeTimeStr = formatStakeTime(record.stakeTime);
+            const timeObj = formatStakeTimeSplit(record.stakeTime);
             
             let statusHtml = '';
             let actionHtml = '';
@@ -691,12 +734,12 @@
                 timeRemainingHtml = '<span class="text-muted">-</span>';
             } else {
                 if (isLocked) {
-                    statusHtml = '<span class="text-danger">正在锁仓</span>';
+                    statusHtml = '<span class="text-danger">锁仓中</span>';
                     actionHtml = `<button class="btn btn-sm btn-secondary" disabled>等待解锁</button>`;
                     timeRemainingHtml = `<span class="countdown countdown-locked" id="countdown-${record.index}">${formatTimeRemaining(record.timeRemaining)}</span>`;
                     startCountdown(record.index, record.timeRemaining);
                 } else if (isUnlocked) {
-                    statusHtml = '<span class="text-success">可以赎回</span>';
+                    statusHtml = '<span class="text-success">可赎回</span>';
                     actionHtml = `<button class="btn btn-sm btn-warning" id="unstake-btn-${record.index}" onclick="handleUnstake(${record.index})">立即赎回</button>`;
                     timeRemainingHtml = '<span class="countdown countdown-unlocked">已解锁</span>';
                 } else {
@@ -708,10 +751,15 @@
 
             html += `
                 <tr id="record-row-${record.index}" ${pendingUpdates.has(record.index.toString()) ? 'class="record-highlight"' : ''}>
-                    <td>${record.index}</td>
+                    <td><span class="id-label">#</span><span class="id-value">${record.index}</span></td>
                     <td>${record.amount}</td>
                     <td><span class="badge-duration">${durationLabel}</span></td>
-                    <td class="stake-time-cell">${stakeTimeStr}</td>
+                    <td class="stake-time-cell">
+                        <div class="time-two-lines">
+                            <span class="time-date">${timeObj.date}</span>
+                            <span class="time-clock">${timeObj.time}</span>
+                        </div>
+                    </td>
                     <td class="remaining-time-cell">${timeRemainingHtml}</td>
                     <td class="status-cell">${statusHtml}</td>
                     <td class="action-cell">${actionHtml}</td>
@@ -1024,7 +1072,7 @@
         pageData.forEach((record, index) => {
             const globalIndex = startIndex + index + 1;
             const amount = formatAmountInteger(record.amount);
-            const stakeTimeStr = formatStakeTime(record.stakeTime);
+            const timeObj = formatStakeTimeSplit(record.stakeTime);
             const durationLabel = STAKE_DURATION_LABELS[record.stakeIndex] || "未知";
             const status = record.isActive ? "已提取" : "质押中";
             const statusClass = record.isActive ? "text-muted" : "text-success";
@@ -1036,7 +1084,12 @@
                     <td><span class="address-short">${shortenAddress(record.userAddress)}</span>${isCurrentUser ? '<span class="badge bg-info ms-2">我</span>' : ''}</td>
                     <td>${amount}</td>
                     <td><span class="badge-duration">${durationLabel}</span></td>
-                    <td class="stake-time-cell">${stakeTimeStr}</td>
+                    <td class="stake-time-cell">
+                        <div class="time-two-lines">
+                            <span class="time-date">${timeObj.date}</span>
+                            <span class="time-clock">${timeObj.time}</span>
+                        </div>
+                    </td>
                     <td class="status-cell"><span class="${statusClass}">${status}</span></td>
                 </tr>
             `;
