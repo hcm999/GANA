@@ -35,30 +35,39 @@
             color: #cbd5e1; 
             font-size: 0.9rem; 
             width: 100%;
-            table-layout: fixed; /* 固定表格布局 */
+            table-layout: fixed;
         }
         .table thead th { 
             border-bottom: 1px solid #475569; 
             color: #94a3b8; 
             font-size: 0.8rem; 
-            padding: 8px 4px; /* 减小内边距 */
+            padding: 8px 2px;
             text-align: center;
             white-space: nowrap;
         }
         .table td { 
             border-bottom: 1px solid #334155; 
             vertical-align: middle;
-            padding: 8px 4px; /* 减小内边距 */
+            padding: 8px 2px;
             text-align: center;
-            word-break: break-word; /* 允许换行 */
+            word-break: break-word;
         }
-        
+
+        /* 列宽设置 */
+        .table th:nth-child(1), .table td:nth-child(1) { width: 5%; }
+        .table th:nth-child(2), .table td:nth-child(2) { width: 8%; }
+        .table th:nth-child(3), .table td:nth-child(3) { width: 8%; }
+        .table th:nth-child(4), .table td:nth-child(4) { width: 30%; }
+        .table th:nth-child(5), .table td:nth-child(5) { width: 22%; }
+        .table th:nth-child(6), .table td:nth-child(6) { width: 10%; }
+        .table th:nth-child(7), .table td:nth-child(7) { width: 17%; }
+
         /* 特定列左对齐 */
         .table td:nth-child(4),
         .table td:nth-child(5) {
             text-align: left;
         }
-        
+
         input.form-control { background-color: #334155; border-color: #475569; color: white; }
         input.form-control:focus { background-color: #334155; color: white; border-color: #38bdf8; box-shadow: none; }
         .staking-btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -76,35 +85,70 @@
         .countdown-unlocked { color: #34d399; }
         .align-items-end label.form-label { color: wheat; }
         
-        /* 调整表格中特定列的字体大小 - 允许换行 */
+        /* 调整表格中特定列的字体大小 */
         .stake-time-cell { 
-            font-size: 0.8rem; 
+            font-size: 0.9rem;
             white-space: normal; 
             font-family: 'Courier New', monospace; 
+            font-weight: 500;
         }
         .remaining-time-cell { 
-            font-size: 0.8rem; 
+            font-size: 0.85rem; 
             white-space: normal; 
             font-family: 'Courier New', monospace; 
         }
-        .status-cell { font-size: 0.8rem; white-space: normal; }
-        .action-cell { font-size: 0.8rem; white-space: normal; }
-        
-        /* 调整ID和金额列的字体大小 */
-        .table td:first-child { font-size: 0.85rem; } /* ID列 */
-        .table td:nth-child(2) { font-size: 0.85rem; } /* 金额列 */
-        
-        /* 调整表格行高 - 允许自动调整 */
-        .table tbody tr { height: auto; min-height: 40px; }
-        
-        /* 调整操作按钮大小 */
-        .action-cell .btn-sm { 
-            padding: 0.15rem 0.4rem; 
-            font-size: 0.75rem; 
-            line-height: 1.2;
+        .status-cell { 
+            font-size: 0.8rem; 
+            white-space: normal; 
+            word-break: break-word;
+            line-height: 1.3;
+        }
+        .action-cell { 
+            font-size: 0.8rem; 
+            white-space: normal; 
+            word-break: break-word;
         }
         
-        /* 选项卡样式 - 完全恢复原样 */
+        /* 调整ID和金额列的字体大小 */
+        .table td:first-child { 
+            font-size: 0.8rem; 
+        }
+        .table td:nth-child(2) { 
+            font-size: 0.8rem; 
+        }
+        
+        /* 状态标签样式 */
+        .status-cell span {
+            display: inline-block;
+            max-width: 100%;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+        
+        /* 操作按钮样式 */
+        .action-cell .btn-sm { 
+            padding: 0.15rem 0.3rem; 
+            font-size: 0.7rem; 
+            line-height: 1.3;
+            white-space: normal;
+            word-break: break-word;
+            max-width: 100%;
+            height: auto;
+            min-height: 24px;
+        }
+        
+        /* 已提取状态的特殊样式 */
+        .action-cell .btn-sm.btn-secondary {
+            white-space: normal;
+            word-break: break-word;
+            height: auto;
+            padding: 0.15rem 0.2rem;
+        }
+        
+        /* 调整表格行高 */
+        .table tbody tr { height: auto; min-height: 40px; }
+        
+        /* 选项卡样式 */
         .nav-tabs { border-bottom: 1px solid #334155; }
         .nav-tabs .nav-link { 
             color: #94a3b8; 
@@ -122,7 +166,7 @@
         }
         .tab-content { padding-top: 1rem; }
         
-        /* 我的质押记录子选项卡样式 - 完全恢复原样 */
+        /* 我的质押记录子选项卡样式 */
         .sub-tabs {
             display: flex;
             gap: 10px;
@@ -196,7 +240,7 @@
             text-align: center;
         }
         
-        /* 让表格容器可以横向滚动 */
+        /* 表格容器 */
         .table-responsive {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -485,7 +529,7 @@
         }
     }
 
-    // 修改：显示到秒
+    // 显示到秒
     function formatTimeRemaining(seconds) {
         if (seconds <= 0) return "0秒";
         const days = Math.floor(seconds / 86400);
@@ -500,7 +544,7 @@
         return result;
     }
     
-    // 修改：显示到秒
+    // 显示到秒
     function formatStakeTime(timestamp) {
         try {
             const date = new Date(timestamp * 1000);
@@ -549,7 +593,7 @@
         }
     }
 
-    // 我的质押记录相关函数
+    // 更新缓存状态
     function updateCacheStatus() {
         const cacheStatusEl = document.getElementById('cacheStatus');
         if (!cacheStatusEl) return;
@@ -818,7 +862,7 @@
         countdownTimers[id] = timer;
     }
 
-    // ========== 全网质押记录刷新函数 ==========
+    // 全网质押记录刷新函数
     async function refreshAllStakeData() {
         if (!stakingContract) {
             alert("请先连接钱包");
@@ -839,18 +883,15 @@
         try {
             allStakeData = [];
             
-            // 获取当前区块高度
             const currentBlock = await provider.getBlockNumber();
             console.log("当前区块高度:", currentBlock);
             
-            // 使用更小的批次，从最新的区块开始往前查
             const BATCH_SIZE = 2000;
-            let fromBlock = Math.max(0, currentBlock - 50000); // 只查最近50000个区块
+            let fromBlock = Math.max(0, currentBlock - 50000);
             let toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
             let totalEvents = 0;
             let batchCount = 0;
             
-            // 计算总批次数
             const totalBatches = Math.ceil((currentBlock - fromBlock + 1) / BATCH_SIZE);
             
             while (fromBlock <= currentBlock) {
@@ -864,14 +905,12 @@
                 console.log(`查询区块 ${fromBlock} 到 ${toBlock} (批次 ${batchCount}/${totalBatches})`);
                 
                 try {
-                    // 直接获取Staked事件
                     const filter = stakingContract.filters.Staked();
                     const events = await stakingContract.queryFilter(filter, fromBlock, toBlock);
                     
                     console.log(`找到 ${events.length} 条事件`);
                     totalEvents += events.length;
                     
-                    // 处理事件
                     for (const event of events) {
                         try {
                             if (event.args) {
@@ -880,7 +919,6 @@
                                 const stakeIndex = Number(event.args[2]);
                                 const stakeTime = Number(event.args[3]);
                                 
-                                // 获取状态
                                 let isActive = true;
                                 try {
                                     const record = await stakingContract.userStakeRecord(user, stakeIndex);
@@ -898,16 +936,13 @@
                         } catch (eventError) {}
                     }
                     
-                    // 更新区块范围
                     fromBlock = toBlock + 1;
                     toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
                     
-                    // 延迟一下
                     await new Promise(resolve => setTimeout(resolve, 200));
                     
                 } catch (batchError) {
                     console.error(`批次查询失败:`, batchError);
-                    // 如果失败，跳过这一批继续
                     fromBlock = toBlock + 1;
                     toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
                 }
@@ -915,10 +950,8 @@
             
             console.log(`总共找到 ${totalEvents} 条事件`);
             
-            // 按时间排序
             allStakeData.sort((a, b) => b.stakeTime - a.stakeTime);
             
-            // 计算统计
             calculateAllStats();
             
             currentPage = 1;
