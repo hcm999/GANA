@@ -29,9 +29,36 @@
         }
         .stat-value { font-size: 1.25rem; font-weight: bold; color: #38bdf8; }
         .stat-label { font-size: 0.85rem; color: #94a3b8; }
-        .table { color: #cbd5e1; font-size: 0.9rem; }
-        .table thead th { border-bottom: 1px solid #475569; color: #94a3b8; font-size: 0.8rem; }
-        .table td { border-bottom: 1px solid #334155; vertical-align: middle; }
+        
+        /* 表格样式优化 - 减小列间距 */
+        .table { 
+            color: #cbd5e1; 
+            font-size: 0.9rem; 
+            width: 100%;
+            table-layout: fixed; /* 固定表格布局 */
+        }
+        .table thead th { 
+            border-bottom: 1px solid #475569; 
+            color: #94a3b8; 
+            font-size: 0.8rem; 
+            padding: 8px 4px; /* 减小内边距 */
+            text-align: center;
+            white-space: nowrap;
+        }
+        .table td { 
+            border-bottom: 1px solid #334155; 
+            vertical-align: middle;
+            padding: 8px 4px; /* 减小内边距 */
+            text-align: center;
+            word-break: break-word; /* 允许换行 */
+        }
+        
+        /* 特定列左对齐 */
+        .table td:nth-child(4),
+        .table td:nth-child(5) {
+            text-align: left;
+        }
+        
         input.form-control { background-color: #334155; border-color: #475569; color: white; }
         input.form-control:focus { background-color: #334155; color: white; border-color: #38bdf8; box-shadow: none; }
         .staking-btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -49,18 +76,17 @@
         .countdown-unlocked { color: #34d399; }
         .align-items-end label.form-label { color: wheat; }
         
-        /* 调整表格列宽 - 让质押周期变窄，给时间和剩余时间腾出空间 */
-        .table th:nth-child(1) { width: 5%; }  /* ID */
-        .table th:nth-child(2) { width: 12%; } /* 金额 */
-        .table th:nth-child(3) { width: 8%; }  /* 质押周期 - 变窄 */
-        .table th:nth-child(4) { width: 25%; } /* 质押时间 - 变宽 */
-        .table th:nth-child(5) { width: 25%; } /* 剩余时间 - 变宽 */
-        .table th:nth-child(6) { width: 10%; } /* 状态 */
-        .table th:nth-child(7) { width: 15%; } /* 操作 */
-        
         /* 调整表格中特定列的字体大小 - 允许换行 */
-        .stake-time-cell { font-size: 0.8rem; white-space: normal; font-family: 'Courier New', monospace; }
-        .remaining-time-cell { font-size: 0.8rem; white-space: normal; font-family: 'Courier New', monospace; }
+        .stake-time-cell { 
+            font-size: 0.8rem; 
+            white-space: normal; 
+            font-family: 'Courier New', monospace; 
+        }
+        .remaining-time-cell { 
+            font-size: 0.8rem; 
+            white-space: normal; 
+            font-family: 'Courier New', monospace; 
+        }
         .status-cell { font-size: 0.8rem; white-space: normal; }
         .action-cell { font-size: 0.8rem; white-space: normal; }
         
@@ -168,6 +194,12 @@
             font-size: 0.85rem;
             color: #38bdf8;
             text-align: center;
+        }
+        
+        /* 让表格容器可以横向滚动 */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
     </style>
 </head>
@@ -290,8 +322,8 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>金额 (USDT)</th>
-                                    <th>质押周期</th>
+                                    <th>金额</th>
+                                    <th>周期</th>
                                     <th>质押时间</th>
                                     <th>剩余时间</th>
                                     <th>状态</th>
@@ -352,8 +384,8 @@
                                 <tr>
                                     <th>序号</th>
                                     <th>用户地址</th>
-                                    <th>金额 (USDT)</th>
-                                    <th>质押周期</th>
+                                    <th>金额</th>
+                                    <th>周期</th>
                                     <th>质押时间</th>
                                     <th>状态</th>
                                 </tr>
@@ -786,7 +818,7 @@
         countdownTimers[id] = timer;
     }
 
-    // ========== 全网质押记录刷新函数（最终修复版）==========
+    // ========== 全网质押记录刷新函数 ==========
     async function refreshAllStakeData() {
         if (!stakingContract) {
             alert("请先连接钱包");
