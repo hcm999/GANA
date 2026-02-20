@@ -34,8 +34,21 @@
         .table td { border-bottom: 1px solid #334155; vertical-align: middle; }
         input.form-control { background-color: #334155; border-color: #475569; color: white; }
         input.form-control:focus { background-color: #334155; color: white; border-color: #38bdf8; box-shadow: none; }
-        .staking-btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .staking-btn-group .btn { flex: 1; min-width: 120px; }
+        
+        /* 修改：质押按钮组 - 防止30天换行 */
+        .staking-btn-group { 
+            display: flex; 
+            gap: 10px; 
+            flex-wrap: nowrap; /* 改为nowrap防止换行 */
+        }
+        .staking-btn-group .btn { 
+            flex: 1; 
+            min-width: 100px; /* 稍微减小最小宽度 */
+            white-space: nowrap; /* 文字不换行 */
+            font-size: 0.9rem;
+            padding: 0.5rem 0.25rem;
+        }
+        
         .badge-duration { background-color: #374151; color: #9ca3af; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; }
         .countdown { 
             font-family: 'Courier New', monospace; 
@@ -87,7 +100,7 @@
         }
         .tab-content { padding-top: 1rem; }
         
-        /* 新增：我的质押记录子选项卡样式 */
+        /* 我的质押记录子选项卡样式 */
         .sub-tabs {
             display: flex;
             gap: 10px;
@@ -148,6 +161,15 @@
         }
         .record-highlight {
             animation: highlight 1s ease-out;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .staking-btn-group .btn { 
+                min-width: 80px;
+                font-size: 0.75rem;
+                padding: 0.4rem 0.1rem;
+            }
         }
     </style>
 </head>
@@ -258,7 +280,7 @@
                         </div>
                     </div>
                     
-                    <!-- 新增：我的质押记录子选项卡 -->
+                    <!-- 我的质押记录子选项卡 -->
                     <div class="sub-tabs">
                         <span class="sub-tab active" onclick="filterMyStakes('all')" id="filter-all">全部</span>
                         <span class="sub-tab" onclick="filterMyStakes('active')" id="filter-active">未赎回</span>
@@ -366,14 +388,7 @@
         STAKING: "0x72212F35aC448FE7763aA1BFdb360193Fa098E52",
         USDT: "0x55d398326f99059fF775485246999027B3197955",
         PAIR: "0xa2f464a2462aed49b9b31eb8861bc6b0bbb0483f",
-        TOTAL_STAKE_PAGE_SIZE: 10,
-        SAMPLE_USER_ADDRESSES: [
-            "0x1234567890123456789012345678901234567890",
-            "0x2345678901234567890123456789012345678901",
-            "0x3456789012345678901234567890123456789012",
-            "0x4567890123456789012345678901234567890123",
-            "0x5678901234567890123456789012345678901234"
-        ]
+        TOTAL_STAKE_PAGE_SIZE: 10
     };
     
     // 质押周期配置 (秒)
@@ -416,19 +431,19 @@
     let myStakeRecords = [];
     let lastFetchTime = 0;
     let pendingUpdates = new Set();
-    let currentFilter = 'all'; // 新增：当前筛选条件
+    let currentFilter = 'all';
 
-    // 工具：格式化金额为4位小数
-    function formatAmount(wei) {
+    // 工具：格式化金额为整数（无小数位）- 用于我的质押记录
+    function formatAmountInteger(wei) {
         try {
             const val = ethers.formatUnits(wei, 18);
-            return parseFloat(val).toFixed(0);
+            return Math.floor(parseFloat(val)).toString();
         } catch (e) {
             return "0";
         }
     }
 
-    // 格式化金额为2位小数
+    // 格式化金额为2位小数（用于余额显示）
     function formatAmountTwoDecimals(wei) {
         try {
             const val = ethers.formatUnits(wei, 18);
@@ -531,7 +546,7 @@
         }
     }
 
-    // 更新单条记录
+    // 更新单条记录 - 修改：使用整数金额
     async function updateSingleRecord(index) {
         if (!userAddress || !stakingContract) return null;
         
@@ -539,7 +554,7 @@
             const record = await stakingContract.userStakeRecord(userAddress, index);
             
             const now = Math.floor(Date.now() / 1000);
-            const amount = formatAmountTwoDecimals(record[1]);
+            const amount = formatAmountInteger(record[1]); // 改为整数
             const stakeTime = Number(record[0]);
             const isActive = record[2];
             const stakeIndex = Number(record[3]);
@@ -591,11 +606,10 @@
         updateCacheStatus();
     }
 
-    // 新增：筛选我的质押记录
+    // 筛选我的质押记录
     function filterMyStakes(filter) {
         currentFilter = filter;
         
-        // 更新按钮样式
         document.getElementById('filter-all').classList.remove('active');
         document.getElementById('filter-active').classList.remove('active');
         document.getElementById('filter-inactive').classList.remove('active');
@@ -611,17 +625,16 @@
         renderStakeListFromCache();
     }
 
-    // 从缓存渲染列表（支持筛选）
+    // 从缓存渲染列表（支持筛选）- 金额已经是整数
     function renderStakeListFromCache() {
         const tbody = document.getElementById('stakeListBody');
         if (!tbody) return;
         
-        // 根据筛选条件过滤
         let filteredRecords = myStakeRecords;
         if (currentFilter === 'active') {
-            filteredRecords = myStakeRecords.filter(r => !r.isActive); // 未赎回
+            filteredRecords = myStakeRecords.filter(r => !r.isActive);
         } else if (currentFilter === 'inactive') {
-            filteredRecords = myStakeRecords.filter(r => r.isActive); // 已赎回
+            filteredRecords = myStakeRecords.filter(r => r.isActive);
         }
         
         if (filteredRecords.length === 0) {
@@ -735,7 +748,7 @@
                 stakeIndex
             );
             
-            const receipt = await txStake.wait();
+            await txStake.wait();
             
             const newCount = await stakingContract.stakeCount(userAddress);
             const newIndex = Number(newCount) - 1;
@@ -902,7 +915,7 @@
             
             console.log("开始获取全网质押记录...");
             
-            // 方法1：从Staked事件获取所有记录
+            // 从Staked事件获取所有记录
             const filter = stakingContract.filters.Staked();
             const events = await stakingContract.queryFilter(filter, 0, 'latest');
             
@@ -921,22 +934,17 @@
                     // 获取这笔质押的当前状态
                     let isActive = true; // 默认为活跃（未赎回）
                     try {
-                        // 注意：record[2] 是 status，false=活跃，true=已赎回
+                        // 注意：record[2] 是 status，true=已赎回，false=活跃
                         const record = await stakingContract.userStakeRecord(user, stakeIndex);
                         isActive = record[2]; // true=已赎回, false=活跃
                     } catch (e) {
                         console.log(`获取记录状态失败: ${user}, ${stakeIndex}`);
                     }
                     
-                    // 计算解锁时间
-                    const durationSeconds = STAKE_DURATIONS[stakeIndex] || 86400;
-                    const unlockTime = stakeTime + durationSeconds;
-                    
                     allStakeData.push({
                         userAddress: user,
                         amount: amount,
                         stakeTime: stakeTime,
-                        unlockTime: unlockTime,
                         isActive: isActive,
                         stakeIndex: stakeIndex
                     });
@@ -1017,7 +1025,7 @@
         
         pageData.forEach((record, index) => {
             const globalIndex = startIndex + index + 1;
-            const amount = formatAmountTwoDecimals(record.amount);
+            const amount = formatAmountInteger(record.amount); // 改为整数
             const stakeTimeStr = formatStakeTime(record.stakeTime);
             const durationLabel = STAKE_DURATION_LABELS[record.stakeIndex] || "未知";
             const status = record.isActive ? "已提取" : "质押中";
