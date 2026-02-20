@@ -34,22 +34,9 @@
         .table td { border-bottom: 1px solid #334155; vertical-align: middle; }
         input.form-control { background-color: #334155; border-color: #475569; color: white; }
         input.form-control:focus { background-color: #334155; color: white; border-color: #38bdf8; box-shadow: none; }
-        
-        /* 质押按钮组 - 防止30天换行 */
-        .staking-btn-group { 
-            display: flex; 
-            gap: 10px; 
-            flex-wrap: nowrap;
-        }
-        .staking-btn-group .btn { 
-            flex: 1; 
-            min-width: 100px;
-            white-space: nowrap;
-            font-size: 0.9rem;
-            padding: 0.5rem 0.25rem;
-        }
-        
-        .badge-duration { background-color: #374151; color: #9ca3af; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; white-space: nowrap; }
+        .staking-btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .staking-btn-group .btn { flex: 1; min-width: 120px; }
+        .badge-duration { background-color: #374151; color: #9ca3af; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; }
         .countdown { 
             font-family: 'Courier New', monospace; 
             background-color: #1f2937; 
@@ -57,29 +44,32 @@
             border-radius: 3px; 
             font-size: 0.75rem;
             display: inline-block;
-            white-space: nowrap;
         }
         .countdown-locked { color: #f87171; }
         .countdown-unlocked { color: #34d399; }
         .align-items-end label.form-label { color: wheat; }
         
-        .stake-time-cell { font-size: 0.8rem; white-space: nowrap; }
-        .remaining-time-cell { font-size: 0.8rem; white-space: nowrap; }
-        .status-cell { font-size: 0.8rem; white-space: nowrap; }
-        .action-cell { font-size: 0.8rem; white-space: nowrap; }
+        /* 调整表格中特定列的字体大小 - 允许换行 */
+        .stake-time-cell { font-size: 0.8rem; white-space: normal; }
+        .remaining-time-cell { font-size: 0.8rem; white-space: normal; }
+        .status-cell { font-size: 0.8rem; white-space: normal; }
+        .action-cell { font-size: 0.8rem; white-space: normal; }
         
-        .table td:first-child { font-size: 0.85rem; }
-        .table td:nth-child(2) { font-size: 0.85rem; }
+        /* 调整ID和金额列的字体大小 */
+        .table td:first-child { font-size: 0.85rem; } /* ID列 */
+        .table td:nth-child(2) { font-size: 0.85rem; } /* 金额列 */
         
-        .table tbody tr { height: 40px; }
+        /* 调整表格行高 - 允许自动调整 */
+        .table tbody tr { height: auto; min-height: 40px; }
         
+        /* 调整操作按钮大小 */
         .action-cell .btn-sm { 
             padding: 0.15rem 0.4rem; 
             font-size: 0.75rem; 
             line-height: 1.2;
-            white-space: nowrap;
         }
         
+        /* 选项卡样式 - 完全恢复原样 */
         .nav-tabs { border-bottom: 1px solid #334155; }
         .nav-tabs .nav-link { 
             color: #94a3b8; 
@@ -97,6 +87,7 @@
         }
         .tab-content { padding-top: 1rem; }
         
+        /* 我的质押记录子选项卡样式 - 完全恢复原样 */
         .sub-tabs {
             display: flex;
             gap: 10px;
@@ -112,7 +103,6 @@
             border-radius: 20px;
             cursor: pointer;
             font-size: 0.85rem;
-            white-space: nowrap;
         }
         .sub-tab:hover {
             background-color: #334155;
@@ -130,7 +120,6 @@
             padding: 2px 6px; 
             border-radius: 3px; 
             font-size: 0.8rem;
-            white-space: nowrap;
         }
         .total-stats-card { border-left: 4px solid #3b82f6; }
         .contract-address { 
@@ -145,12 +134,14 @@
             margin: 5px 0;
         }
         
+        /* 缓存状态提示 */
         .cache-status {
             font-size: 0.7rem;
             color: #6b7280;
             margin-left: 10px;
         }
         
+        /* 记录项高亮 */
         @keyframes highlight {
             0% { background-color: #3b82f6; }
             100% { background-color: transparent; }
@@ -159,6 +150,7 @@
             animation: highlight 1s ease-out;
         }
         
+        /* 加载进度提示 */
         .loading-progress {
             margin-top: 10px;
             padding: 10px;
@@ -167,14 +159,6 @@
             font-size: 0.85rem;
             color: #38bdf8;
             text-align: center;
-        }
-        
-        @media (max-width: 768px) {
-            .staking-btn-group .btn { 
-                min-width: 80px;
-                font-size: 0.75rem;
-                padding: 0.4rem 0.1rem;
-            }
         }
     </style>
 </head>
@@ -210,25 +194,25 @@
         <div class="col-6 col-md-3">
             <div class="card p-3 h-100">
                 <div class="stat-label">我的 USDT 余额</div>
-                <div class="stat-value" id="myBalance">0.0000</div>
+                <div class="stat-value" id="myBalance">0.00</div>
             </div>
         </div>
         <div class="col-6 col-md-3">
             <div class="card p-3 h-100">
                 <div class="stat-label">待提现余额 (合约内)</div>
-                <div class="stat-value" id="stakedBalance">0.0000</div>
+                <div class="stat-value" id="stakedBalance">0.00</div>
             </div>
         </div>
         <div class="col-6 col-md-3">
             <div class="card p-3 h-100">
                 <div class="stat-label">可提现 USDT (池子)</div>
-                <div class="stat-value" id="poolBalance">0.0000</div>
+                <div class="stat-value" id="poolBalance">0.00</div>
             </div>
         </div>
         <div class="col-6 col-md-3">
             <div class="card p-3 h-100">
                 <div class="stat-label">合约总质押</div>
-                <div class="stat-value" id="totalStaked">0.0000</div>
+                <div class="stat-value" id="totalStaked">0.00</div>
             </div>
         </div>
     </div>
@@ -338,7 +322,7 @@
                         <div class="col-6 col-md-3">
                             <div class="card p-3 h-100">
                                 <div class="stat-label">平均质押金额</div>
-                                <div class="stat-value" id="avgStakeAmount">0.0000</div>
+                                <div class="stat-value" id="avgStakeAmount">0.00</div>
                             </div>
                         </div>
                         <div class="col-6 col-md-3">
@@ -413,7 +397,7 @@
     };
     // ===========================================
 
-    // ABIs - 使用您提供的新ABI
+    // ABIs
     const ABI_ERC20 = [
         "function balanceOf(address owner) view returns (uint256)",
         "function decimals() view returns (uint8)",
@@ -441,7 +425,7 @@
     let pendingUpdates = new Set();
     let currentFilter = 'all';
 
-    // 工具：格式化金额为整数（无小数位）
+    // 工具函数
     function formatAmountInteger(wei) {
         try {
             const val = ethers.formatUnits(wei, 18);
@@ -451,7 +435,6 @@
         }
     }
 
-    // 格式化金额为2位小数（用于余额显示）
     function formatAmountTwoDecimals(wei) {
         try {
             const val = ethers.formatUnits(wei, 18);
@@ -461,52 +444,41 @@
         }
     }
 
-    // 格式化时间：将秒转换为天、小时、分钟
     function formatTimeRemaining(seconds) {
         if (seconds <= 0) return "0秒";
-        
         const days = Math.floor(seconds / 86400);
         const hours = Math.floor((seconds % 86400) / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-        
         let result = "";
         if (days > 0) result += `${days}天`;
         if (hours > 0) result += `${hours}小时`;
         if (minutes > 0 && days === 0) result += `${minutes}分`;
-        if (secs > 0 && days === 0 && hours === 0) result += `${secs}秒`;
-        
         return result || "0秒";
     }
     
-    // 格式化质押时间
     function formatStakeTime(timestamp) {
         try {
             const date = new Date(timestamp * 1000);
             const now = new Date();
-            const diffMs = now - date;
-            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-            
+            const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
             if (diffDays === 0) {
-                return '今天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                return '今天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
             } else if (diffDays === 1) {
-                return '昨天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                return '昨天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
             } else {
-                return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) + ' ' + 
-                       date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
             }
         } catch (e) {
             return "时间错误";
         }
     }
     
-    // 缩短地址显示
     function shortenAddress(address) {
         if (!address) return '';
         return address.substring(0, 6) + '...' + address.substring(address.length - 4);
     }
 
-    // 1. 连接钱包
+    // 连接钱包
     async function connectWallet() {
         if (!window.ethereum) {
             alert("请安装 MetaMask!");
@@ -524,43 +496,30 @@
             usdtContract = new ethers.Contract(CONFIG.USDT, ABI_ERC20, signer);
 
             await refreshData();
-            
-            alert("钱包连接成功！\n合约地址：" + CONFIG.STAKING);
         } catch (error) {
             console.error("连接失败:", error);
             alert("连接钱包失败: " + (error.message || error));
         }
     }
 
-    // 更新缓存状态显示
+    // 我的质押记录相关函数（保持不变）
     function updateCacheStatus() {
         const cacheStatusEl = document.getElementById('cacheStatus');
         if (!cacheStatusEl) return;
-        
         const now = Date.now();
-        const timeDiff = now - lastFetchTime;
-        
         if (lastFetchTime === 0) {
             cacheStatusEl.textContent = '未加载';
-            return;
-        }
-        
-        if (pendingUpdates.size > 0) {
+        } else if (pendingUpdates.size > 0) {
             cacheStatusEl.textContent = `🔄 更新中 (${pendingUpdates.size}条)`;
-        } else if (timeDiff < 5000) {
-            cacheStatusEl.textContent = '✅ 已是最新';
         } else {
-            cacheStatusEl.textContent = `⏱️ ${Math.round(timeDiff/1000)}秒前更新`;
+            cacheStatusEl.textContent = `⏱️ ${Math.round((now - lastFetchTime)/1000)}秒前更新`;
         }
     }
 
-    // 更新单条记录
     async function updateSingleRecord(index) {
         if (!userAddress || !stakingContract) return null;
-        
         try {
             const record = await stakingContract.userStakeRecord(userAddress, index);
-            
             const now = Math.floor(Date.now() / 1000);
             const amount = formatAmountInteger(record[1]);
             const stakeTime = Number(record[0]);
@@ -570,15 +529,7 @@
             const unlockTime = stakeTime + durationSeconds;
             const timeRemaining = unlockTime - now;
             
-            const updatedRecord = {
-                index,
-                amount,
-                stakeTime,
-                isActive,
-                stakeIndex,
-                unlockTime,
-                timeRemaining
-            };
+            const updatedRecord = { index, amount, stakeTime, isActive, stakeIndex, unlockTime, timeRemaining };
             
             const existingIndex = myStakeRecords.findIndex(r => r.index === index);
             if (existingIndex >= 0) {
@@ -586,54 +537,33 @@
             } else {
                 myStakeRecords.push(updatedRecord);
             }
-            
             myStakeRecords.sort((a, b) => b.index - a.index);
-            
             return updatedRecord;
         } catch (error) {
-            console.error(`更新记录 ${index} 失败:`, error);
             return null;
         }
     }
 
-    // 只更新变化的记录
     async function refreshChangedRecords() {
         if (!userAddress || !stakingContract) return;
-        
         const changedIndices = Array.from(pendingUpdates);
         if (changedIndices.length === 0) return;
-        
         updateCacheStatus();
-        
-        const updatePromises = changedIndices.map(index => updateSingleRecord(parseInt(index)));
-        await Promise.all(updatePromises);
-        
+        await Promise.all(changedIndices.map(index => updateSingleRecord(parseInt(index))));
         pendingUpdates.clear();
-        
         renderStakeListFromCache();
         updateCacheStatus();
     }
 
-    // 筛选我的质押记录
     function filterMyStakes(filter) {
         currentFilter = filter;
-        
         document.getElementById('filter-all').classList.remove('active');
         document.getElementById('filter-active').classList.remove('active');
         document.getElementById('filter-inactive').classList.remove('active');
-        
-        if (filter === 'all') {
-            document.getElementById('filter-all').classList.add('active');
-        } else if (filter === 'active') {
-            document.getElementById('filter-active').classList.add('active');
-        } else if (filter === 'inactive') {
-            document.getElementById('filter-inactive').classList.add('active');
-        }
-        
+        document.getElementById(`filter-${filter}`).classList.add('active');
         renderStakeListFromCache();
     }
 
-    // 从缓存渲染列表
     function renderStakeListFromCache() {
         const tbody = document.getElementById('stakeListBody');
         if (!tbody) return;
@@ -673,7 +603,6 @@
                     statusHtml = '<span class="text-danger">正在锁仓</span>';
                     actionHtml = `<button class="btn btn-sm btn-secondary" disabled>等待解锁</button>`;
                     timeRemainingHtml = `<span class="countdown countdown-locked" id="countdown-${record.index}">${formatTimeRemaining(record.timeRemaining)}</span>`;
-                    
                     startCountdown(record.index, record.timeRemaining);
                 } else if (isUnlocked) {
                     statusHtml = '<span class="text-success">可以赎回</span>';
@@ -703,19 +632,15 @@
         document.getElementById('myStakeCount').textContent = myStakeRecords.length;
         
         setTimeout(() => {
-            document.querySelectorAll('.record-highlight').forEach(el => {
-                el.classList.remove('record-highlight');
-            });
+            document.querySelectorAll('.record-highlight').forEach(el => el.classList.remove('record-highlight'));
         }, 1000);
     }
 
     // 质押操作
     async function handleStake(stakeIndex, durationDays) {
         if (!userAddress) return alert("请先连接钱包");
-        
         const amountStr = document.getElementById('stakeAmount').value;
         if (!amountStr || parseFloat(amountStr) <= 0) return alert("请输入有效金额");
-        
         const amountWei = ethers.parseUnits(amountStr, 18);
         
         const buttons = document.querySelectorAll('.staking-btn-group .btn');
@@ -730,18 +655,6 @@
             const currentBtn = event.target;
             currentBtn.textContent = "检查限额...";
 
-            try {
-                const minStake = await stakingContract.MIN_STAKE_USDT();
-                const minStakeAmount = parseFloat(ethers.formatUnits(minStake, 18));
-                if (parseFloat(amountStr) < minStakeAmount) {
-                    alert(`质押金额不能小于 ${minStakeAmount} USDT`);
-                    throw new Error("金额太小");
-                }
-            } catch (e) {
-                console.log("最小质押金额检查失败，继续...");
-            }
-
-            currentBtn.textContent = "检查授权...";
             const allowance = await usdtContract.allowance(userAddress, CONFIG.STAKING);
             if (allowance < amountWei) {
                 currentBtn.textContent = "正在授权 USDT...";
@@ -750,30 +663,20 @@
             }
 
             currentBtn.textContent = "正在质押...";
-            const txStake = await stakingContract.stake(
-                amountWei, 
-                0, 
-                stakeIndex
-            );
-            
+            const txStake = await stakingContract.stake(amountWei, 0, stakeIndex);
             await txStake.wait();
             
             const newCount = await stakingContract.stakeCount(userAddress);
             const newIndex = Number(newCount) - 1;
-            
             pendingUpdates.add(newIndex.toString());
             
             await refreshStatsOnly();
             await refreshChangedRecords();
             
-            alert(`质押成功！周期：${durationDays}天，记录ID：${newIndex}`);
-
+            alert(`质押成功！周期：${durationDays}天`);
         } catch (error) {
             console.error(error);
-            if(error.reason) alert("合约错误: " + error.reason);
-            else if(error.message.includes("User denied")) alert("用户取消交易");
-            else if(error.message.includes("insufficient allowance")) alert("请先授权USDT");
-            else alert("质押失败: " + (error.message || error));
+            alert("质押失败: " + (error.message || error));
         } finally {
             buttons.forEach((btn, index) => {
                 btn.disabled = false;
@@ -782,10 +685,8 @@
         }
     }
 
-    // 只更新统计数据
     async function refreshStatsOnly() {
         if (!userAddress) return;
-        
         try {
             const [myBal, stakedBal, poolBal, totalStaked] = await Promise.all([
                 usdtContract.balanceOf(userAddress),
@@ -793,54 +694,39 @@
                 usdtContract.balanceOf(CONFIG.PAIR),
                 stakingContract.totalSupply()
             ]);
-            
             document.getElementById('myBalance').innerText = formatAmountTwoDecimals(myBal);
             document.getElementById('stakedBalance').innerText = formatAmountTwoDecimals(stakedBal);
             document.getElementById('poolBalance').innerText = formatAmountTwoDecimals(poolBal);
             document.getElementById('totalStaked').innerText = formatAmountTwoDecimals(totalStaked);
-            
         } catch (error) {
             console.error("统计刷新失败:", error);
         }
     }
 
-    // 赎回操作
     async function handleUnstake(index) {
         if (!userAddress) return;
-        
         const btn = document.getElementById(`unstake-btn-${index}`);
         if(btn) {
             btn.disabled = true;
             btn.innerText = "处理中...";
         }
-
         try {
             const tx = await stakingContract.unstake(index);
-            console.log("Transaction sent:", tx.hash);
-            
             await tx.wait();
-            
             pendingUpdates.add(index.toString());
-            
             await refreshStatsOnly();
             await refreshChangedRecords();
-            
             alert("赎回成功！");
-
         } catch (error) {
             console.error(error);
+            alert("赎回失败: " + (error.message || error));
             if(btn) {
                 btn.disabled = false;
                 btn.innerText = "赎回";
             }
-            
-            if(error.reason) alert("合约错误: " + error.reason);
-            else if(error.message.includes("User denied")) alert("用户取消交易");
-            else alert("赎回失败: " + (error.message || error));
         }
     }
 
-    // 刷新所有数据
     async function refreshData() {
         if (!userAddress) return;
         const btn = document.querySelector('button[onclick="refreshData()"]');
@@ -849,20 +735,15 @@
         
         try {
             await refreshStatsOnly();
-            
             const newCount = await stakingContract.stakeCount(userAddress);
-            
             if (myStakeRecords.length !== Number(newCount)) {
                 for (let i = 0; i < Number(newCount); i++) {
                     pendingUpdates.add(i.toString());
                 }
             }
-            
             await refreshChangedRecords();
-            
             lastFetchTime = Date.now();
             updateCacheStatus();
-            
         } catch (error) {
             console.error("数据加载错误:", error);
         } finally {
@@ -870,40 +751,27 @@
         }
     }
 
-    // 启动倒计时定时器
     function startCountdown(id, initialSeconds) {
         let remaining = initialSeconds;
         const countdownElement = document.getElementById(`countdown-${id}`);
-        
         if (!countdownElement) return;
         
         const timer = setInterval(() => {
             remaining--;
-            
             if (remaining <= 0) {
                 clearInterval(timer);
                 pendingUpdates.add(id.toString());
                 refreshChangedRecords();
                 return;
             }
-            
             if (countdownElement) {
                 countdownElement.textContent = formatTimeRemaining(remaining);
-                
-                if (remaining <= 3600) {
-                    countdownElement.style.color = '#f87171';
-                } else if (remaining <= 86400) {
-                    countdownElement.style.color = '#fbbf24';
-                } else {
-                    countdownElement.style.color = '#60a5fa';
-                }
             }
         }, 1000);
-        
         countdownTimers[id] = timer;
     }
 
-    // ========== 全网质押记录刷新函数（修复版） ==========
+    // ========== 全网质押记录刷新函数（最终修复版）==========
     async function refreshAllStakeData() {
         if (!stakingContract) {
             alert("请先连接钱包");
@@ -918,7 +786,6 @@
         btn.innerText = "加载中...";
         isLoadingAllData = true;
         
-        // 显示加载进度
         const progressEl = document.getElementById('loadingProgress');
         if (progressEl) progressEl.style.display = 'block';
         
@@ -929,25 +796,20 @@
             const currentBlock = await provider.getBlockNumber();
             console.log("当前区块高度:", currentBlock);
             
-            // 使用正确的事件签名
-            const eventTopic = ethers.id("Staked(address,uint256,uint256,uint256)");
-            console.log("事件主题:", eventTopic);
-            
-            // 分批次获取事件（每批 50000 个区块）
-            const BATCH_SIZE = 50000;
-            let fromBlock = 0;
+            // 使用更小的批次，从最新的区块开始往前查
+            const BATCH_SIZE = 2000; // 减小批次大小
+            let fromBlock = Math.max(0, currentBlock - 50000); // 只查最近50000个区块
             let toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
             let totalEvents = 0;
             let batchCount = 0;
             
             // 计算总批次数
-            const totalBatches = Math.ceil((currentBlock + 1) / BATCH_SIZE);
+            const totalBatches = Math.ceil((currentBlock - fromBlock + 1) / BATCH_SIZE);
             
             while (fromBlock <= currentBlock) {
                 batchCount++;
                 const progress = Math.round((batchCount / totalBatches) * 100);
                 
-                // 更新进度提示
                 if (progressEl) {
                     progressEl.innerHTML = `正在加载历史数据... ${progress}% (第 ${batchCount}/${totalBatches} 批)`;
                 }
@@ -955,76 +817,50 @@
                 console.log(`查询区块 ${fromBlock} 到 ${toBlock} (批次 ${batchCount}/${totalBatches})`);
                 
                 try {
-                    // 手动创建filter，避免filters方法的问题
-                    const filter = {
-                        address: CONFIG.STAKING,
-                        topics: [eventTopic],
-                        fromBlock: fromBlock,
-                        toBlock: toBlock
-                    };
-                    
-                    const events = await provider.getLogs(filter);
+                    // 直接获取Staked事件
+                    const filter = stakingContract.filters.Staked();
+                    const events = await stakingContract.queryFilter(filter, fromBlock, toBlock);
                     
                     console.log(`找到 ${events.length} 条事件`);
                     totalEvents += events.length;
                     
-                    // 解析每个事件
-                    for (const log of events) {
+                    // 处理事件
+                    for (const event of events) {
                         try {
-                            // 解析日志
-                            const parsedLog = stakingContract.interface.parseLog({
-                                topics: log.topics,
-                                data: log.data
-                            });
-                            
-                            if (parsedLog && parsedLog.args) {
-                                // 事件参数顺序根据ABI确定
-                                const user = parsedLog.args.user;
-                                const amount = parsedLog.args.amount;
-                                const stakeIndex = parsedLog.args.index;
-                                const stakeTime = parsedLog.args.stakeTime;
+                            if (event.args) {
+                                const amount = event.args[0];
+                                const user = event.args[1];
+                                const stakeIndex = Number(event.args[2]);
+                                const stakeTime = Number(event.args[3]);
                                 
-                                // 获取这笔质押的当前状态
+                                // 获取状态
                                 let isActive = true;
                                 try {
                                     const record = await stakingContract.userStakeRecord(user, stakeIndex);
-                                    isActive = record[2]; // true=已赎回, false=活跃
-                                } catch (e) {
-                                    console.log(`获取记录状态失败: ${user}, ${stakeIndex}`);
-                                }
+                                    isActive = record[2];
+                                } catch (e) {}
                                 
                                 allStakeData.push({
                                     userAddress: user,
                                     amount: amount,
-                                    stakeTime: Number(stakeTime),
+                                    stakeTime: stakeTime,
                                     isActive: isActive,
-                                    stakeIndex: Number(stakeIndex)
+                                    stakeIndex: stakeIndex
                                 });
                             }
-                        } catch (parseError) {
-                            console.error("解析事件失败:", parseError);
-                        }
+                        } catch (eventError) {}
                     }
                     
                     // 更新区块范围
                     fromBlock = toBlock + 1;
                     toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
                     
-                    // 稍微延迟一下，避免请求太频繁
-                    await new Promise(resolve => setTimeout(resolve, 100));
+                    // 延迟一下
+                    await new Promise(resolve => setTimeout(resolve, 200));
                     
                 } catch (batchError) {
-                    console.error(`批次查询失败 (${fromBlock}-${toBlock}):`, batchError);
-                    
-                    // 如果失败，用更小的批次重试
-                    if (progressEl) {
-                        progressEl.innerHTML = `查询失败，尝试缩小批次...`;
-                    }
-                    
-                    // 缩小批次重试
-                    await retryBatchWithSmallerSize(fromBlock, toBlock, progressEl);
-                    
-                    // 更新区块范围
+                    console.error(`批次查询失败:`, batchError);
+                    // 如果失败，跳过这一批继续
                     fromBlock = toBlock + 1;
                     toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
                 }
@@ -1032,18 +868,15 @@
             
             console.log(`总共找到 ${totalEvents} 条事件`);
             
-            // 按质押时间倒序排序
+            // 按时间排序
             allStakeData.sort((a, b) => b.stakeTime - a.stakeTime);
             
-            // 计算统计信息
+            // 计算统计
             calculateAllStats();
             
-            // 重置到第一页
             currentPage = 1;
             renderAllStakeList();
             updatePagination();
-            
-            console.log(`全网质押记录加载完成，共 ${allStakeData.length} 条`);
             
             if (progressEl) {
                 progressEl.innerHTML = `加载完成！共 ${allStakeData.length} 条记录`;
@@ -1059,11 +892,9 @@
             btn.innerText = "刷新失败";
             
             if (progressEl) {
-                progressEl.innerHTML = '加载失败: ' + (error.message || error);
+                progressEl.innerHTML = '加载失败，请稍后重试';
                 progressEl.style.color = '#ef4444';
             }
-            
-            alert("刷新失败: " + (error.message || error));
         } finally {
             setTimeout(() => {
                 btn.disabled = false;
@@ -1072,104 +903,34 @@
             }, 2000);
         }
     }
-
-    // 辅助函数：用更小的批次重试
-    async function retryBatchWithSmallerSize(fromBlock, toBlock, progressEl) {
-        const SMALL_BATCH = 10000;
-        let smallFrom = fromBlock;
-        let smallTo = Math.min(smallFrom + SMALL_BATCH - 1, toBlock);
-        
-        const eventTopic = ethers.id("Staked(address,uint256,uint256,uint256)");
-        
-        while (smallFrom <= toBlock) {
-            if (progressEl) {
-                progressEl.innerHTML = `重试中... 区块 ${smallFrom}-${smallTo}`;
-            }
-            
-            console.log(`重试小批次 ${smallFrom} 到 ${smallTo}...`);
-            
-            try {
-                const filter = {
-                    address: CONFIG.STAKING,
-                    topics: [eventTopic],
-                    fromBlock: smallFrom,
-                    toBlock: smallTo
-                };
-                
-                const events = await provider.getLogs(filter);
-                
-                for (const log of events) {
-                    try {
-                        const parsedLog = stakingContract.interface.parseLog({
-                            topics: log.topics,
-                            data: log.data
-                        });
-                        
-                        if (parsedLog && parsedLog.args) {
-                            const user = parsedLog.args.user;
-                            const amount = parsedLog.args.amount;
-                            const stakeIndex = parsedLog.args.index;
-                            const stakeTime = parsedLog.args.stakeTime;
-                            
-                            let isActive = true;
-                            try {
-                                const record = await stakingContract.userStakeRecord(user, stakeIndex);
-                                isActive = record[2];
-                            } catch (e) {}
-                            
-                            allStakeData.push({
-                                userAddress: user,
-                                amount: amount,
-                                stakeTime: Number(stakeTime),
-                                isActive: isActive,
-                                stakeIndex: Number(stakeIndex)
-                            });
-                        }
-                    } catch (parseError) {}
-                }
-                
-            } catch (error) {
-                console.error(`小批次重试失败:`, error);
-                throw error;
-            }
-            
-            smallFrom = smallTo + 1;
-            smallTo = Math.min(smallFrom + SMALL_BATCH - 1, toBlock);
-            await new Promise(resolve => setTimeout(resolve, 200));
-        }
-    }
     
-    // 计算总质押统计信息
+    // 计算统计
     function calculateAllStats() {
         if (allStakeData.length === 0) {
             document.getElementById('totalUsers').textContent = '0';
             document.getElementById('activeStakes').textContent = '0';
-            document.getElementById('avgStakeAmount').textContent = '0.0000';
+            document.getElementById('avgStakeAmount').textContent = '0.00';
             document.getElementById('totalStakeCount').textContent = '0';
             return;
         }
         
-        const uniqueUsers = new Set();
-        allStakeData.forEach(record => uniqueUsers.add(record.userAddress));
+        const uniqueUsers = new Set(allStakeData.map(r => r.userAddress));
         document.getElementById('totalUsers').textContent = uniqueUsers.size;
         
-        const activeStakes = allStakeData.filter(record => !record.isActive).length;
+        const activeStakes = allStakeData.filter(r => !r.isActive).length;
         document.getElementById('activeStakes').textContent = activeStakes;
         
         document.getElementById('totalStakeCount').textContent = allStakeData.length;
         
-        const totalAmount = allStakeData.reduce((sum, record) => {
-            return sum + parseFloat(ethers.formatUnits(record.amount, 18));
+        const totalAmount = allStakeData.reduce((sum, r) => {
+            return sum + parseFloat(ethers.formatUnits(r.amount, 18));
         }, 0);
-        
-        const avgAmount = totalAmount / allStakeData.length;
-        document.getElementById('avgStakeAmount').textContent = avgAmount.toFixed(2);
+        document.getElementById('avgStakeAmount').textContent = (totalAmount / allStakeData.length).toFixed(2);
     }
     
     // 渲染总质押列表
     function renderAllStakeList() {
         const tbody = document.getElementById('allStakeListBody');
-        
         if (allStakeData.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="text-center">暂无质押记录</td></tr>';
             return;
@@ -1180,7 +941,6 @@
         const pageData = allStakeData.slice(startIndex, endIndex);
         
         let html = '';
-        
         pageData.forEach((record, index) => {
             const globalIndex = startIndex + index + 1;
             const amount = formatAmountInteger(record.amount);
@@ -1193,10 +953,7 @@
             html += `
                 <tr>
                     <td>${globalIndex}</td>
-                    <td>
-                        <span class="address-short">${shortenAddress(record.userAddress)}</span>
-                        ${isCurrentUser ? '<span class="badge bg-info ms-2">我</span>' : ''}
-                    </td>
+                    <td><span class="address-short">${shortenAddress(record.userAddress)}</span>${isCurrentUser ? '<span class="badge bg-info ms-2">我</span>' : ''}</td>
                     <td>${amount}</td>
                     <td><span class="badge-duration">${durationLabel}</span></td>
                     <td class="stake-time-cell">${stakeTimeStr}</td>
@@ -1208,13 +965,10 @@
         tbody.innerHTML = html;
     }
     
-    // 更新分页控件
     function updatePagination() {
         totalPages = Math.ceil(allStakeData.length / CONFIG.TOTAL_STAKE_PAGE_SIZE);
-        
         document.getElementById('currentPage').textContent = currentPage;
         document.getElementById('totalPages').textContent = totalPages || 1;
-        
         document.getElementById('prevPageBtn').disabled = currentPage <= 1;
         document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
     }
@@ -1235,16 +989,12 @@
         }
     }
     
-    // 自动刷新功能
+    // 自动刷新
     function startAutoRefresh() {
-        if (autoRefreshInterval) {
-            clearInterval(autoRefreshInterval);
-        }
-        
+        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
         autoRefreshInterval = setInterval(async () => {
             if (userAddress) {
                 const newCount = await stakingContract.stakeCount(userAddress);
-                
                 if (myStakeRecords.length !== Number(newCount)) {
                     for (let i = 0; i < Number(newCount); i++) {
                         if (!myStakeRecords.some(r => r.index === i)) {
@@ -1252,21 +1002,14 @@
                         }
                     }
                 }
-                
                 await refreshChangedRecords();
                 await refreshStatsOnly();
-                
-                const activeTab = document.querySelector('#stakeTab .nav-link.active');
-                if (activeTab && activeTab.id === 'all-stake-tab') {
-                    await refreshAllStakeData();
-                }
             }
         }, 30000);
     }
 
     function toggleAutoRefresh() {
         const btn = document.getElementById('autoRefreshBtn');
-        
         if (autoRefreshInterval) {
             clearInterval(autoRefreshInterval);
             autoRefreshInterval = null;
@@ -1281,27 +1024,20 @@
         }
     }
 
-    // 页面卸载时清理定时器
+    // 清理定时器
     window.addEventListener('beforeunload', () => {
-        if (autoRefreshInterval) {
-            clearInterval(autoRefreshInterval);
-        }
-        Object.keys(countdownTimers).forEach(id => {
-            clearInterval(countdownTimers[id]);
-        });
+        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+        Object.keys(countdownTimers).forEach(id => clearInterval(countdownTimers[id]));
     });
 
-    // 初始连接钱包
+    // 初始化
     window.addEventListener('load', () => {
         if (typeof window.ethereum !== 'undefined') {
             window.ethereum.request({ method: 'eth_accounts' })
                 .then(accounts => {
-                    if (accounts.length > 0) {
-                        connectWallet();
-                    }
+                    if (accounts.length > 0) connectWallet();
                 });
         }
-        
         document.getElementById('stakingContractAddress').textContent = CONFIG.STAKING;
         document.getElementById('lpContractAddress').textContent = CONFIG.PAIR;
     });
