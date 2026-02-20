@@ -49,9 +49,18 @@
         .countdown-unlocked { color: #34d399; }
         .align-items-end label.form-label { color: wheat; }
         
+        /* 调整表格列宽 - 让质押周期变窄，给时间和剩余时间腾出空间 */
+        .table th:nth-child(1) { width: 5%; }  /* ID */
+        .table th:nth-child(2) { width: 12%; } /* 金额 */
+        .table th:nth-child(3) { width: 8%; }  /* 质押周期 - 变窄 */
+        .table th:nth-child(4) { width: 25%; } /* 质押时间 - 变宽 */
+        .table th:nth-child(5) { width: 25%; } /* 剩余时间 - 变宽 */
+        .table th:nth-child(6) { width: 10%; } /* 状态 */
+        .table th:nth-child(7) { width: 15%; } /* 操作 */
+        
         /* 调整表格中特定列的字体大小 - 允许换行 */
-        .stake-time-cell { font-size: 0.8rem; white-space: normal; }
-        .remaining-time-cell { font-size: 0.8rem; white-space: normal; }
+        .stake-time-cell { font-size: 0.8rem; white-space: normal; font-family: 'Courier New', monospace; }
+        .remaining-time-cell { font-size: 0.8rem; white-space: normal; font-family: 'Courier New', monospace; }
         .status-cell { font-size: 0.8rem; white-space: normal; }
         .action-cell { font-size: 0.8rem; white-space: normal; }
         
@@ -444,29 +453,35 @@
         }
     }
 
+    // 修改：显示到秒
     function formatTimeRemaining(seconds) {
         if (seconds <= 0) return "0秒";
         const days = Math.floor(seconds / 86400);
         const hours = Math.floor((seconds % 86400) / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
         let result = "";
         if (days > 0) result += `${days}天`;
         if (hours > 0) result += `${hours}小时`;
-        if (minutes > 0 && days === 0) result += `${minutes}分`;
-        return result || "0秒";
+        if (minutes > 0) result += `${minutes}分`;
+        if (secs > 0 || (days === 0 && hours === 0 && minutes === 0)) result += `${secs}秒`;
+        return result;
     }
     
+    // 修改：显示到秒
     function formatStakeTime(timestamp) {
         try {
             const date = new Date(timestamp * 1000);
             const now = new Date();
-            const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+            const diffMs = now - date;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
             if (diffDays === 0) {
-                return '今天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                return '今天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             } else if (diffDays === 1) {
-                return '昨天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+                return '昨天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             } else {
-                return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+                return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }) + ' ' + 
+                       date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             }
         } catch (e) {
             return "时间错误";
@@ -502,7 +517,7 @@
         }
     }
 
-    // 我的质押记录相关函数（保持不变）
+    // 我的质押记录相关函数
     function updateCacheStatus() {
         const cacheStatusEl = document.getElementById('cacheStatus');
         if (!cacheStatusEl) return;
@@ -797,7 +812,7 @@
             console.log("当前区块高度:", currentBlock);
             
             // 使用更小的批次，从最新的区块开始往前查
-            const BATCH_SIZE = 2000; // 减小批次大小
+            const BATCH_SIZE = 2000;
             let fromBlock = Math.max(0, currentBlock - 50000); // 只查最近50000个区块
             let toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
             let totalEvents = 0;
