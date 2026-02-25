@@ -613,8 +613,8 @@
                     <!-- 交易费用选项 - 新增 -->
                     <div class="fee-options">
                         <label class="form-label mb-2">交易费用设置</label>
-                        <div class="fee-option selected" onclick="selectFeeOption('standard')" id="fee-standard">
-                            <input type="radio" name="feeOption" value="standard" checked onchange="selectFeeOption('standard')">
+                        <div class="fee-option selected" onclick="selectFeeOption('slow')" id="fee-slow">
+                            <input type="radio" name="feeOption" value="slow" checked onchange="selectFeeOption('slow')">
                             <div class="fee-label">
                                 <div class="fee-name">标准 (推荐)</div>
                                 <div class="fee-desc">默认费用，等待时间适中</div>
@@ -718,7 +718,7 @@
     let currentFilter = 'all';
 
     // 交易费用相关
-    let currentFeeOption = 'standard';
+    let currentFeeOption = 'slow';  // 改为 'standard'标准
     let gasPrices = {
         standard: null,
         slow: null,
@@ -1109,6 +1109,10 @@
     // ================= 单笔赎回 =================
     async function handleUnstake(index) {
         if (!userAddress) return;
+            
+    // 添加这行，设置默认费用选项为经济模式
+    selectFeeOption('slow');
+    
         const btn = document.getElementById(`unstake-btn-${index}`);
         if(btn) {
             btn.disabled = true;
@@ -1192,6 +1196,10 @@
         
         updateGasPrices(); // 更新Gas价格
         updateBatchStakeSummary();
+            
+    // 添加这行，设置默认选中经济模式
+    selectFeeOption('slow');  // 添加这行代码
+        
         batchStakeModal.show();
     }
     
@@ -1352,6 +1360,9 @@
     
     // ================= 批量赎回 =================
     async function batchUnstake() {
+    // 添加这行，设置默认费用选项为经济模式
+    selectFeeOption('slow');
+    
         const checkboxes = document.querySelectorAll('.record-checkbox:checked');
         const selectedIndices = Array.from(checkboxes)
             .map(cb => parseInt(cb.value))
