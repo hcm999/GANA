@@ -9,7 +9,6 @@
     <!-- 引入 Ethers.js V6 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <style>
-        /* 所有原有样式保持不变 */
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .card { background-color: #1e293b; border: 1px solid #334155; }
         .card-title { color: #fff; }
@@ -21,7 +20,7 @@
         .btn-warning:hover { background-color: #d97706; color: #fff; }
         .btn-info { background-color: #3b82f6; border: none; color: #fff; }
         
-        /* 新增的复选框样式 */
+        /* 复选框样式 */
         .checkbox-column {
             width: 40px;
             text-align: center;
@@ -33,7 +32,7 @@
             accent-color: #3b82f6;
         }
         
-        /* 新增的批量操作栏 */
+        /* 批量操作栏 */
         .batch-actions {
             background-color: #2d3748;
             padding: 15px;
@@ -50,7 +49,7 @@
             margin-right: 15px;
         }
         
-        /* 新增的批量质押模态框 */
+        /* 批量质押模态框 - 修复汇总信息样式 */
         .modal-content {
             background-color: #1e293b;
             color: #e2e8f0;
@@ -74,7 +73,27 @@
             box-shadow: none;
         }
         
-        /* 原有的其他样式保持不变 */
+        /* 汇总信息卡片 - 修复看不清的问题 */
+        .summary-card {
+            background-color: #0f172a;
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #e2e8f0;
+            font-size: 1rem;
+        }
+        .summary-item .value {
+            color: #38bdf8;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
         .warning-box {
             background-color: #450a0a;
             border: 1px solid #ef4444;
@@ -87,6 +106,7 @@
         .stat-value { font-size: 1.25rem; font-weight: bold; color: #38bdf8; }
         .stat-label { font-size: 0.85rem; color: #94a3b8; }
         
+        /* 表格样式优化 - 恢复原来的间距和列宽 */
         .table { 
             color: #cbd5e1; 
             font-size: 0.9rem; 
@@ -109,7 +129,7 @@
             word-break: break-word;
         }
 
-        /* 列宽设置 - 增加复选框列 */
+        /* 列宽设置 - 恢复原来的8列表格 */
         .table th:nth-child(1), .table td:nth-child(1) { width: 5%; }  /* 复选框 */
         .table th:nth-child(2), .table td:nth-child(2) { width: 5%; }  /* ID */
         .table th:nth-child(3), .table td:nth-child(3) { width: 12%; } /* 金额 */
@@ -178,7 +198,6 @@
         input.form-control { background-color: #334155; border-color: #475569; color: white; }
         input.form-control:focus { background-color: #334155; color: white; border-color: #38bdf8; box-shadow: none; }
         
-        /* 原有的单笔质押按钮组 */
         .staking-btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .staking-btn-group .btn { flex: 1; min-width: 120px; }
         
@@ -251,18 +270,24 @@
             border-radius: 3px; 
             font-size: 0.8rem;
         }
-        .contract-address { 
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #60a5fa;
-            word-break: break-all;
-            background-color: #1f2937;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin: 5px 0;
+        
+        /* 缓存状态提示 - 恢复 */
+        .cache-status {
+            font-size: 0.7rem;
+            color: #6b7280;
+            margin-left: 10px;
         }
         
+        /* 记录项高亮 */
+        @keyframes highlight {
+            0% { background-color: #3b82f6; }
+            100% { background-color: transparent; }
+        }
+        .record-highlight {
+            animation: highlight 1s ease-out;
+        }
+        
+        /* 加载进度提示 */
         .loading-progress {
             margin-top: 10px;
             padding: 10px;
@@ -273,7 +298,7 @@
             text-align: center;
         }
         
-        /* 新增的进度条样式 */
+        /* 进度条 */
         .progress-bar {
             background-color: #334155;
             height: 4px;
@@ -289,32 +314,13 @@
     </style>
 </head>
 <body>
-    <!-- 合约地址信息 (完全保留原有) -->
-    <div class="alert alert-info mb-4">
-        <h6 class="fw-bold">合约地址信息</h6>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="mb-2">
-                    <small class="text-muted">质押合约：</small>
-                    <div class="contract-address" id="stakingContractAddress">0x72212F35aC448FE7763aA1BFdb360193Fa098E52</div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="mb-2">
-                    <small class="text-muted">LP池合约：</small>
-                    <div class="contract-address" id="lpContractAddress">0xa2f464a2462aed49b9b31eb8861bc6b0bbb0483f</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 钱包连接 (完全保留原有) -->
+    <!-- 移除合约地址信息卡片，只留一个简单的标题 -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold">GANA质押管理平台 - 批量操作版</h3>
         <button id="connectBtn" class="btn btn-primary" onclick="connectWallet()">连接钱包</button>
     </div>
 
-    <!-- 数据统计面板 (完全保留原有) -->
+    <!-- 数据统计面板 -->
     <div class="row mb-4 text-center g-2">
         <div class="col-6 col-md-3">
             <div class="card p-3 h-100">
@@ -342,7 +348,7 @@
         </div>
     </div>
 
-    <!-- 原有单笔质押区域 - 完全恢复 -->
+    <!-- 原有单笔质押区域 -->
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title mb-3">参与质押 (单笔)</h5>
@@ -373,23 +379,26 @@
         </button>
     </div>
 
-    <!-- 质押记录区域 (完全保留原有，只增加复选框列) -->
+    <!-- 质押记录区域 -->
     <div class="card">
         <div class="card-body">
-            <!-- 选项卡导航 (完全保留原有) -->
+            <!-- 选项卡导航 - 修改第四个标签为跳转链接 -->
             <ul class="nav nav-tabs" id="stakeTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="my-stake-tab" data-bs-toggle="tab" data-bs-target="#my-stake" type="button" role="tab" aria-controls="my-stake" aria-selected="true">我的质押记录 <span id="myStakeCount" class="badge bg-secondary ms-1">0</span></button>
+                    <button class="nav-link active" id="my-stake-tab" data-bs-toggle="tab" data-bs-target="#my-stake" type="button" role="tab">我的质押记录 <span id="myStakeCount" class="badge bg-secondary ms-1">0</span></button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="all-stake-tab" data-bs-toggle="tab" data-bs-target="#all-stake" type="button" role="tab" aria-controls="all-stake" aria-selected="false">合约总质押记录</button>
+                    <button class="nav-link" id="all-stake-tab" data-bs-toggle="tab" data-bs-target="#all-stake" type="button" role="tab">合约总质押记录</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" href="https://www.ganaweb3.top" target="_blank" role="tab">📊 质押数据平台</a>
                 </li>
             </ul>
             
             <!-- 选项卡内容 -->
             <div class="tab-content" id="stakeTabContent">
-                <!-- 我的质押记录 (增加批量操作栏) -->
-                <div class="tab-pane fade show active" id="my-stake" role="tabpanel" aria-labelledby="my-stake-tab">
+                <!-- 我的质押记录 -->
+                <div class="tab-pane fade show active" id="my-stake" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
                         <h5 class="card-title mb-0">
                             我的质押记录
@@ -401,7 +410,7 @@
                         </div>
                     </div>
                     
-                    <!-- 新增的批量操作栏 -->
+                    <!-- 批量操作栏 -->
                     <div class="batch-actions" id="batchActions" style="display: none;">
                         <div class="selected-count" id="selectedCount">已选择 0 条记录</div>
                         <button class="btn btn-warning btn-sm" onclick="batchUnstake()" id="batchUnstakeBtn">
@@ -415,14 +424,14 @@
                         </button>
                     </div>
                     
-                    <!-- 我的质押记录子选项卡 (完全保留原有) -->
+                    <!-- 我的质押记录子选项卡 -->
                     <div class="sub-tabs">
                         <span class="sub-tab active" onclick="filterMyStakes('all')" id="filter-all">全部</span>
                         <span class="sub-tab" onclick="filterMyStakes('active')" id="filter-active">未赎回</span>
                         <span class="sub-tab" onclick="filterMyStakes('inactive')" id="filter-inactive">已赎回</span>
                     </div>
                     
-                    <!-- 新增的批量操作进度条 -->
+                    <!-- 批量操作进度条 -->
                     <div id="batchProgress" style="display: none;" class="mb-3">
                         <div class="d-flex justify-content-between mb-1">
                             <span id="progressText">准备中...</span>
@@ -437,11 +446,9 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <!-- 新增复选框列 -->
                                     <th class="checkbox-column">
                                         <input type="checkbox" class="record-checkbox" id="selectAllCheckbox" onclick="toggleSelectAll()">
                                     </th>
-                                    <!-- 原有列全部保留 -->
                                     <th>ID</th>
                                     <th>金额</th>
                                     <th>周期</th>
@@ -458,8 +465,8 @@
                     </div>
                 </div>
                 
-                <!-- 合约总质押记录 (完全保留原有) -->
-                <div class="tab-pane fade" id="all-stake" role="tabpanel" aria-labelledby="all-stake-tab">
+                <!-- 合约总质押记录 (保留原有) -->
+                <div class="tab-pane fade" id="all-stake" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
                         <h5 class="card-title mb-0">合约总质押记录</h5>
                         <div>
@@ -467,7 +474,7 @@
                         </div>
                     </div>
                     
-                    <!-- 总质押统计 (完全保留原有) -->
+                    <!-- 总质押统计 -->
                     <div class="row mb-4 text-center g-2">
                         <div class="col-6 col-md-3">
                             <div class="card p-3 h-100">
@@ -495,10 +502,10 @@
                         </div>
                     </div>
                     
-                    <!-- 加载进度提示 (完全保留原有) -->
+                    <!-- 加载进度提示 -->
                     <div id="loadingProgress" class="loading-progress" style="display: none;"></div>
                     
-                    <!-- 总质押列表 (完全保留原有) -->
+                    <!-- 总质押列表 -->
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -517,7 +524,7 @@
                         </table>
                     </div>
                     
-                    <!-- 分页控件 (完全保留原有) -->
+                    <!-- 分页控件 -->
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <div class="text-white small">
                             显示 <span id="currentPage">1</span> / <span id="totalPages">1</span> 页
@@ -532,7 +539,7 @@
         </div>
     </div>
 
-    <!-- 新增的批量质押模态框 -->
+    <!-- 批量质押模态框 - 修复版 -->
     <div class="modal fade" id="batchStakeModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -563,11 +570,15 @@
                         </button>
                     </div>
                     
-                    <div class="mb-3">
-                        <label class="form-label">汇总信息</label>
-                        <div class="card p-3">
-                            <div>总质押笔数: <span id="totalStakeCount">0</span></div>
-                            <div>总质押金额: <span id="totalStakeAmount">0.00</span> USDT</div>
+                    <!-- 修复汇总信息样式 - 更清晰可见 -->
+                    <div class="summary-card">
+                        <div class="summary-item">
+                            <span>总质押笔数：</span>
+                            <span class="value" id="totalStakeCount">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>总质押金额：</span>
+                            <span class="value" id="totalStakeAmount">0.00</span> USDT
                         </div>
                     </div>
                 </div>
@@ -580,20 +591,20 @@
     </div>
 </div>
 
-<!-- 引入 Bootstrap JS (完全保留原有) -->
+<!-- 引入 Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // ================= 配置区域 (完全保留原有) =================
+    // ================= 配置区域 =================
     const CONFIG = {
         STAKING: "0x72212F35aC448FE7763aA1BFdb360193Fa098E52",
         USDT: "0x55d398326f99059fF775485246999027B3197955",
         PAIR: "0xa2f464a2462aed49b9b31eb8861bc6b0bbb0483f",
         TOTAL_STAKE_PAGE_SIZE: 10,
-        BATCH_SIZE: 5 // 新增：每批处理的交易数量
+        BATCH_SIZE: 5 // 每批处理的交易数量
     };
     
-    // 质押周期配置 (完全保留原有)
+    // 质押周期配置 (秒)
     const STAKE_DURATIONS = {
         0: 86400,
         1: 1296000,
@@ -607,7 +618,7 @@
     };
     // ===========================================
 
-    // ABIs (完全保留原有)
+    // ABIs (使用你提供的ABI)
     const ABI_ERC20 = [
         "function balanceOf(address owner) view returns (uint256)",
         "function decimals() view returns (uint8)",
@@ -615,28 +626,28 @@
         "function allowance(address owner, address spender) view returns (uint256)"
     ];
 
-    const ABI_STAKING = [{"inputs":[{"internalType":"address","name":"marketingAddress_","type":"address"},{"internalType":"address","name":"devAddress_","type":"address"},{"internalType":"address","name":"threesevenAddress_","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"uint256","name":"x","type":"uint256"},{"internalType":"uint256","name":"y","type":"uint256"}],"name":"PRBMath_MulDiv18_Overflow","type":"error"},{"inputs":[{"internalType":"uint256","name":"x","type":"uint256"},{"internalType":"uint256","name":"y","type":"uint256"},{"internalType":"uint256","name":"denominator","type":"uint256"}],"name":"PRBMath_MulDiv_Overflow","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"},{"indexed":false,"internalType":"uint40","name":"timestamp","type":"uint40"},{"indexed":false,"internalType":"uint256","name":"index","type":"uint256"}],"name":"RewardPaid","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"index","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"stakeTime","type":"uint256"}],"name":"Staked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"GANA","outputs":[{"internalType":"contract IGANA","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MIN_STAKE_USDT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"back_Fee","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"balance","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"devAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"isPreacher","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"market_Fee","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"marketingAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"maxStakeAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"network1In","outputs":[{"internalType":"uint256","name":"value","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"index","type":"uint8"}],"name":"principalPlusRewardOfSlot","outputs":[{"internalType":"uint256","name":"reward","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"ratePerSec","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_gana","type":"address"}],"name":"setGANA","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint160","name":"_amount","type":"uint160"},{"internalType":"uint256","name":"amountOutMin","type":"uint256"},{"internalType":"uint8","name":"_stakeIndex","type":"uint8"}],"name":"stake","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"stakeCount","outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"sync","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"t_supply","outputs":[{"internalType":"uint40","name":"stakeTime","type":"uint40"},{"internalType":"uint160","name":"tamount","type":"uint160"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"threesevenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"threeseven_Fee","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"unstake","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"userIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"userStakeRecord","outputs":[{"internalType":"uint40","name":"stakeTime","type":"uint40"},{"internalType":"uint160","name":"amount","type":"uint160"},{"internalType":"bool","name":"status","type":"bool"},{"internalType":"uint8","name":"stakeIndex","type":"uint8"}],"stateMutability":"view","type":"function"}];
+    const ABI_STAKING = [{"inputs":[{"internalType":"address","name":"marketingAddress_","type":"address"},{"internalType":"address","name":"devAddress_","type":"address"},{"internalType":"address","name":"threesevenAddress_","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"uint256","name":"x","type":"uint256"},{"internalType":"uint256","name":"y","type":"uint256"}],"name":"PRBMath_MulDiv18_Overflow","type":"error"},{"inputs":[{"internalType":"uint256","name":"x","type":"uint256"},{"internalType":"uint256","name":"y","type":"uint256"},{"internalType":"uint256","name":"denominator","type":"uint256"}],"name":"PRBMath_MulDiv_Overflow","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"},{"indexed":false,"internalType":"uint40","name":"timestamp","type":"uint40"},{"indexed":false,"internalType":"uint256","name":"index","type":"uint256"}],"name":"RewardPaid","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"index","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"stakeTime","type":"uint256"}],"name":"Staked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"GANA","outputs":[{"internalType":"contract IGANA","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MIN_STAKE_USDT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"back_Fee","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"balance","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"balances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"devAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"isPreacher","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"market_Fee","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"marketingAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"maxStakeAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"network1In","outputs":[{"internalType":"uint256","name":"value","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"index","type":"uint8"}],"name":"principalPlusRewardOfSlot","outputs":[{"internalType":"uint256","name":"reward","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"ratePerSec","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_gana","type":"address"}],"name":"setGANA","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint160","name":"_amount","type":"uint160"},{"internalType":"uint256","name":"amountOutMin","type":"uint256"},{"internalType":"uint8","name":"_stakeIndex","type":"uint8"}],"name":"stake","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"stakeCount","outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"sync","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"t_supply","outputs":[{"internalType":"uint40","name":"stakeTime","type":"uint40"},{"internalType":"uint160","name":"tamount","type":"uint160"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"threesevenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"threeseven_Fee","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"unstake","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"userIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"userStakeRecord","outputs":[{"internalType":"uint40","name":"stakeTime","type":"uint40"},{"internalType":"uint160","name":"amount","type":"uint160"},{"internalType":"bool","name":"status","type":"bool"},{"internalType":"uint8","name":"stakeIndex","type":"uint8"}],"stateMutability":"view","type":"function"}];
 
-    // 全局变量 (完全保留原有)
+    // 全局变量
     let provider, signer, userAddress;
     let stakingContract, usdtContract;
     let autoRefreshInterval = null;
     let countdownTimers = {};
     let batchStakeModal;
     
-    // 总质押记录相关变量 (完全保留原有)
+    // 总质押记录相关变量
     let allStakeData = [];
     let currentPage = 1;
     let totalPages = 1;
     let isLoadingAllData = false;
 
-    // 我的质押记录缓存 (完全保留原有)
+    // 我的质押记录缓存
     let myStakeRecords = [];
     let lastFetchTime = 0;
     let pendingUpdates = new Set();
     let currentFilter = 'all';
 
-    // ================= 工具函数 (完全保留原有) =================
+    // ================= 工具函数 =================
     function formatAmountInteger(wei) {
         try {
             const val = ethers.formatUnits(wei, 18);
@@ -708,9 +719,21 @@
         return address.substring(0, 6) + '...' + address.substring(address.length - 4);
     }
 
-    // ================= 原有核心函数 (完全保留) =================
-    
-    // 连接钱包 (完全保留原有)
+    // ================= 缓存状态更新 =================
+    function updateCacheStatus() {
+        const cacheStatusEl = document.getElementById('cacheStatus');
+        if (!cacheStatusEl) return;
+        const now = Date.now();
+        if (lastFetchTime === 0) {
+            cacheStatusEl.textContent = '未加载';
+        } else if (pendingUpdates.size > 0) {
+            cacheStatusEl.textContent = `🔄 更新中 (${pendingUpdates.size}条)`;
+        } else {
+            cacheStatusEl.textContent = `⏱️ ${Math.round((now - lastFetchTime)/1000)}秒前更新`;
+        }
+    }
+
+    // ================= 连接钱包 =================
     async function connectWallet() {
         if (!window.ethereum) {
             alert("请安装 MetaMask!");
@@ -734,7 +757,7 @@
         }
     }
 
-    // 原有单笔质押函数 - 完全恢复
+    // ================= 单笔质押 =================
     async function handleStake(stakeIndex, durationDays) {
         if (!userAddress) return alert("请先连接钱包");
         const amountStr = document.getElementById('stakeAmount').value;
@@ -783,7 +806,7 @@
         }
     }
 
-    // 原有刷新统计函数 (完全保留)
+    // ================= 刷新统计 =================
     async function refreshStatsOnly() {
         if (!userAddress) return;
         try {
@@ -802,7 +825,7 @@
         }
     }
 
-    // 原有更新单条记录函数 (完全保留)
+    // ================= 更新单条记录 =================
     async function updateSingleRecord(index) {
         if (!userAddress || !stakingContract) return null;
         try {
@@ -831,7 +854,7 @@
         }
     }
 
-    // 原有刷新变更记录函数 (完全保留)
+    // ================= 刷新变更记录 =================
     async function refreshChangedRecords() {
         if (!userAddress || !stakingContract) return;
         const changedIndices = Array.from(pendingUpdates);
@@ -839,9 +862,10 @@
         await Promise.all(changedIndices.map(index => updateSingleRecord(parseInt(index))));
         pendingUpdates.clear();
         renderStakeListFromCache();
+        updateCacheStatus();
     }
 
-    // 原有过滤函数 (完全保留)
+    // ================= 过滤 =================
     function filterMyStakes(filter) {
         currentFilter = filter;
         document.getElementById('filter-all').classList.remove('active');
@@ -851,7 +875,7 @@
         renderStakeListFromCache();
     }
 
-    // ================= 修改的渲染函数 (只增加复选框列) =================
+    // ================= 渲染列表 =================
     function renderStakeListFromCache() {
         const tbody = document.getElementById('stakeListBody');
         if (!tbody) return;
@@ -882,14 +906,13 @@
             let statusHtml = '';
             let actionHtml = '';
             let timeRemainingHtml = '';
-            let checkboxDisabled = true; // 默认禁用复选框
+            let checkboxDisabled = true;
 
-            // 原有状态判断逻辑完全不变
             if (record.isActive) {
                 statusHtml = '<span class="text-muted">已提取</span>';
                 actionHtml = '-';
                 timeRemainingHtml = '<span class="text-muted">-</span>';
-                checkboxDisabled = true; // 已提取的不可选
+                checkboxDisabled = true;
             } else {
                 if (isLocked) {
                     statusHtml = '<span class="text-danger">锁仓中</span>';
@@ -900,12 +923,13 @@
                             <span class="remaining-bottom">${timeRemainingObj.bottom}</span>
                         </div>
                     `;
-                    checkboxDisabled = true; // 锁仓中的不可选
+                    checkboxDisabled = true;
                 } else if (isUnlocked) {
                     statusHtml = '<span class="text-success">可赎回</span>';
-                    actionHtml = `<button class="btn btn-sm btn-warning" onclick="handleUnstake(${record.index})">赎回</button>`;
+                    // 恢复为"立即赎回"
+                    actionHtml = `<button class="btn btn-sm btn-warning" onclick="handleUnstake(${record.index})">立即赎回</button>`;
                     timeRemainingHtml = '<span class="remaining-top unlocked">已解锁</span>';
-                    checkboxDisabled = false; // 可赎回的可选
+                    checkboxDisabled = false;
                 } else {
                     statusHtml = '<span class="text-warning">未知</span>';
                     actionHtml = '-';
@@ -914,7 +938,6 @@
                 }
             }
 
-            // 在原有HTML基础上增加复选框列
             html += `
                 <tr id="record-row-${record.index}" ${pendingUpdates.has(record.index.toString()) ? 'class="record-highlight"' : ''}>
                     <td class="checkbox-column">
@@ -941,7 +964,6 @@
         tbody.innerHTML = html;
         document.getElementById('myStakeCount').textContent = myStakeRecords.length;
         
-        // 重置全选复选框
         document.getElementById('selectAllCheckbox').checked = false;
         
         setTimeout(() => {
@@ -949,7 +971,7 @@
         }, 1000);
     }
 
-    // ================= 修改的单笔赎回函数 (增加进度条，但不影响原有逻辑) =================
+    // ================= 单笔赎回 =================
     async function handleUnstake(index) {
         if (!userAddress) return;
         const btn = document.getElementById(`unstake-btn-${index}`);
@@ -958,7 +980,6 @@
             btn.innerText = "处理中...";
         }
         try {
-            // 新增进度条显示 (不影响原有赎回逻辑)
             showBatchProgress(1);
             updateProgressText("正在赎回...", 30);
             
@@ -990,7 +1011,7 @@
         }
     }
 
-    // 原有刷新数据函数 (完全保留)
+    // ================= 刷新数据 =================
     async function refreshData() {
         if (!userAddress) return;
         const btn = document.querySelector('button[onclick="refreshData()"]');
@@ -1007,6 +1028,7 @@
             }
             await refreshChangedRecords();
             lastFetchTime = Date.now();
+            updateCacheStatus();
         } catch (error) {
             console.error("数据加载错误:", error);
         } finally {
@@ -1014,39 +1036,7 @@
         }
     }
 
-    // 原有倒计时函数 (完全保留)
-    function startCountdown(id, initialSeconds) {
-        let remaining = initialSeconds;
-        const countdownElement = document.getElementById(`countdown-${id}`);
-        if (!countdownElement) return;
-        
-        const cellElement = countdownElement.closest('.remaining-time-cell');
-        
-        const timer = setInterval(() => {
-            remaining--;
-            if (remaining <= 0) {
-                clearInterval(timer);
-                pendingUpdates.add(id.toString());
-                refreshChangedRecords();
-                return;
-            }
-            
-            if (cellElement) {
-                const timeRemainingObj = formatTimeRemainingSplit(remaining);
-                const topSpan = cellElement.querySelector('.remaining-top');
-                const bottomSpan = cellElement.querySelector('.remaining-bottom');
-                if (topSpan && bottomSpan) {
-                    topSpan.textContent = timeRemainingObj.top;
-                    bottomSpan.textContent = timeRemainingObj.bottom;
-                }
-            }
-        }, 1000);
-        countdownTimers[id] = timer;
-    }
-
-    // ================= 新增的批量操作函数 =================
-    
-    // 显示批量质押模态框
+    // ================= 批量质押相关 =================
     function showBatchStakeModal() {
         if (!userAddress) {
             alert("请先连接钱包");
@@ -1057,7 +1047,6 @@
             batchStakeModal = new bootstrap.Modal(document.getElementById('batchStakeModal'));
         }
         
-        // 重置表单
         document.getElementById('stakeAmountsContainer').innerHTML = `
             <div class="input-group mb-2">
                 <input type="number" class="form-control stake-amount" placeholder="输入金额" value="1000">
@@ -1069,7 +1058,6 @@
         batchStakeModal.show();
     }
     
-    // 添加质押金额输入框
     function addStakeAmount() {
         const container = document.getElementById('stakeAmountsContainer');
         const newInput = document.createElement('div');
@@ -1082,7 +1070,6 @@
         updateBatchStakeSummary();
     }
     
-    // 删除质押金额输入框
     function removeStakeAmount(btn) {
         const container = document.getElementById('stakeAmountsContainer');
         if (container.children.length > 1) {
@@ -1093,7 +1080,6 @@
         }
     }
     
-    // 更新批量质押汇总
     function updateBatchStakeSummary() {
         const amounts = document.querySelectorAll('.stake-amount');
         let total = 0;
@@ -1111,14 +1097,12 @@
         document.getElementById('totalStakeAmount').textContent = total.toFixed(2);
     }
     
-    // 监听金额输入变化
     document.addEventListener('input', function(e) {
         if (e.target.classList.contains('stake-amount')) {
             updateBatchStakeSummary();
         }
     });
     
-    // 执行批量质押
     async function executeBatchStake() {
         if (!userAddress) return alert("请先连接钱包");
         
@@ -1214,7 +1198,7 @@
         }
     }
     
-    // 批量赎回
+    // ================= 批量赎回 =================
     async function batchUnstake() {
         const checkboxes = document.querySelectorAll('.record-checkbox:checked');
         const selectedIndices = Array.from(checkboxes)
@@ -1304,7 +1288,7 @@
         }
     }
     
-    // 复选框相关函数
+    // ================= 复选框相关 =================
     function toggleSelectAll() {
         const selectAll = document.getElementById('selectAllCheckbox').checked;
         const checkboxes = document.querySelectorAll('.record-checkbox:not([disabled])');
@@ -1357,7 +1341,7 @@
         }
     }
     
-    // 进度条函数
+    // ================= 进度条 =================
     function showBatchProgress(total) {
         const progressEl = document.getElementById('batchProgress');
         progressEl.style.display = 'block';
@@ -1373,8 +1357,8 @@
     function hideBatchProgress() {
         document.getElementById('batchProgress').style.display = 'none';
     }
-    
-    // 自动刷新 (完全保留原有)
+
+    // ================= 自动刷新 =================
     function startAutoRefresh() {
         if (autoRefreshInterval) clearInterval(autoRefreshInterval);
         autoRefreshInterval = setInterval(async () => {
@@ -1408,10 +1392,8 @@
             btn.classList.add('btn-info');
         }
     }
-    
-    // ================= 以下函数完全保留原有，未做任何修改 =================
-    
-    // 全网质押记录刷新函数 (完全保留原有)
+
+    // ================= 全网质押记录刷新 =================
     async function refreshAllStakeData() {
         if (!stakingContract) {
             alert("请先连接钱包");
@@ -1533,7 +1515,6 @@
         }
     }
     
-    // 计算统计 (完全保留原有)
     function calculateAllStats() {
         if (allStakeData.length === 0) {
             document.getElementById('totalUsers').textContent = '0';
@@ -1557,7 +1538,6 @@
         document.getElementById('avgStakeAmount').textContent = (totalAmount / allStakeData.length).toFixed(2);
     }
     
-    // 渲染总质押列表 (完全保留原有)
     function renderAllStakeList() {
         const tbody = document.getElementById('allStakeListBody');
         if (allStakeData.length === 0) {
@@ -1599,7 +1579,6 @@
         tbody.innerHTML = html;
     }
     
-    // 分页函数 (完全保留原有)
     function updatePagination() {
         totalPages = Math.ceil(allStakeData.length / CONFIG.TOTAL_STAKE_PAGE_SIZE);
         document.getElementById('currentPage').textContent = currentPage;
@@ -1624,13 +1603,13 @@
         }
     }
     
-    // 清理定时器 (完全保留原有)
+    // ================= 清理定时器 =================
     window.addEventListener('beforeunload', () => {
         if (autoRefreshInterval) clearInterval(autoRefreshInterval);
         Object.keys(countdownTimers).forEach(id => clearInterval(countdownTimers[id]));
     });
     
-    // 初始化 (完全保留原有)
+    // ================= 初始化 =================
     window.addEventListener('load', () => {
         if (typeof window.ethereum !== 'undefined') {
             window.ethereum.request({ method: 'eth_accounts' })
@@ -1638,8 +1617,7 @@
                     if (accounts.length > 0) connectWallet();
                 });
         }
-        document.getElementById('stakingContractAddress').textContent = CONFIG.STAKING;
-        document.getElementById('lpContractAddress').textContent = CONFIG.PAIR;
+        document.getElementById('stakingContractAddress')?.remove(); // 移除合约地址显示
     });
 </script>
 </body>
