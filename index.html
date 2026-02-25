@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GANA质押管理平台批量操作</title>
+    <title>GANA质押管理平台</title>
     <!-- 引入 Bootstrap 用于快速布局 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- 引入 Ethers.js V6 -->
@@ -18,82 +18,6 @@
         .btn-danger { background-color: #ef4444; border: none; }
         .btn-warning { background-color: #f59e0b; border: none; color: #fff; }
         .btn-warning:hover { background-color: #d97706; color: #fff; }
-        .btn-info { background-color: #3b82f6; border: none; color: #fff; }
-        
-        /* 复选框样式 */
-        .checkbox-column {
-            width: 40px;
-            text-align: center;
-        }
-        .record-checkbox {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: #3b82f6;
-        }
-        
-        /* 批量操作栏 */
-        .batch-actions {
-            background-color: #2d3748;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .selected-count {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin-right: 15px;
-        }
-        
-        /* 批量质押模态框 - 修复汇总信息样式 */
-        .modal-content {
-            background-color: #1e293b;
-            color: #e2e8f0;
-            border: 1px solid #334155;
-        }
-        .modal-header {
-            border-bottom: 1px solid #334155;
-        }
-        .modal-footer {
-            border-top: 1px solid #334155;
-        }
-        .modal .form-control, .modal .form-select {
-            background-color: #334155;
-            border-color: #475569;
-            color: white;
-        }
-        .modal .form-control:focus, .modal .form-select:focus {
-            background-color: #334155;
-            color: white;
-            border-color: #38bdf8;
-            box-shadow: none;
-        }
-        
-        /* 汇总信息卡片 - 修复看不清的问题 */
-        .summary-card {
-            background-color: #0f172a;
-            border: 1px solid #3b82f6;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            color: #e2e8f0;
-            font-size: 1rem;
-        }
-        .summary-item .value {
-            color: #38bdf8;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-        
         .warning-box {
             background-color: #450a0a;
             border: 1px solid #ef4444;
@@ -106,7 +30,7 @@
         .stat-value { font-size: 1.25rem; font-weight: bold; color: #38bdf8; }
         .stat-label { font-size: 0.85rem; color: #94a3b8; }
         
-        /* 表格样式优化 - 恢复原来的间距和列宽 */
+        /* 表格样式优化 */
         .table { 
             color: #cbd5e1; 
             font-size: 0.9rem; 
@@ -129,28 +53,30 @@
             word-break: break-word;
         }
 
-        /* 列宽设置 - 恢复原来的8列表格 */
-        .table th:nth-child(1), .table td:nth-child(1) { width: 5%; }  /* 复选框 */
-        .table th:nth-child(2), .table td:nth-child(2) { width: 7%; }  /* ID */
-        .table th:nth-child(3), .table td:nth-child(3) { width: 15%; } /* 金额 */
-        .table th:nth-child(4), .table td:nth-child(4) { width: 9%; }  /* 周期 */
-        .table th:nth-child(5), .table td:nth-child(5) { width: 19%; } /* 质押时间 */
-        .table th:nth-child(6), .table td:nth-child(6) { width: 19%; } /* 剩余时间 */
-        .table th:nth-child(7), .table td:nth-child(7) { width: 10%; } /* 状态 */
-        .table th:nth-child(8), .table td:nth-child(8) { width: 16%; } /* 操作 */
+        /* 列宽设置 - 优化版 */
+        .table th:nth-child(1), .table td:nth-child(1) { width: 7%; }  /* ID列 - 缩小 */
+        .table th:nth-child(2), .table td:nth-child(2) { width: 15%; }  /* 金额列 */
+        .table th:nth-child(3), .table td:nth-child(3) { width: 10%; } /* 周期列 */
+        .table th:nth-child(4), .table td:nth-child(4) { width: 20%; } /* 质押时间 */
+        .table th:nth-child(5), .table td:nth-child(5) { width: 20%; } /* 剩余时间 - 分两行 */
+        .table th:nth-child(6), .table td:nth-child(6) { width: 12%; } /* 状态列 */
+        .table th:nth-child(7), .table td:nth-child(7) { width: 16%; } /* 操作列 */
 
+        /* ID列样式 - 取消标签，黑色字体，减小 */
         .id-value {
             font-size: 0.7rem;
-            color: #94a3b8;
+            color: #94a3b8; /* 灰色 */
             font-weight: normal;
         }
 
+        /* 金额列样式 - 调大一点，红色 */
         .amount-value {
             font-size: 0.9rem;
-            color: #f87171;
+            color: #f87171; /* 红色 */
             font-weight: 500;
         }
 
+        /* 周期标签 */
         .badge-duration { 
             background-color: #374151; 
             color: #9ca3af; 
@@ -162,6 +88,7 @@
             font-weight: 500;
         }
         
+        /* 时间双行显示 */
         .time-two-lines {
             display: flex;
             flex-direction: column;
@@ -176,6 +103,7 @@
             color: #94a3b8;
         }
         
+        /* 剩余时间双行显示 */
         .remaining-two-lines {
             display: flex;
             flex-direction: column;
@@ -183,7 +111,7 @@
         }
         .remaining-top {
             font-size: 0.8rem;
-            color: #f87171;
+            color: #f87171; /* 红色 */
             font-weight: 500;
         }
         .remaining-bottom {
@@ -191,23 +119,52 @@
             color: #94a3b8;
         }
         
+        /* 已解锁状态的特殊样式 */
         .remaining-top.unlocked {
-            color: #34d399;
+            color: #34d399; /* 绿色 */
+        }
+        
+        /* 倒计时样式 - 移除原有样式，使用新的双行样式 */
+        .countdown { 
+            display: inline-block;
+            width: 100%;
         }
         
         input.form-control { background-color: #334155; border-color: #475569; color: white; }
         input.form-control:focus { background-color: #334155; color: white; border-color: #38bdf8; box-shadow: none; }
-        
         .staking-btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .staking-btn-group .btn { flex: 1; min-width: 120px; }
         
         .align-items-end label.form-label { color: wheat; }
         
-        .stake-time-cell { white-space: normal; }
-        .remaining-time-cell { white-space: normal; }
-        .status-cell { font-size: 0.8rem; white-space: normal; word-break: break-word; line-height: 1.3; }
-        .action-cell { font-size: 0.8rem; white-space: normal; word-break: break-word; }
+        /* 调整表格中特定列的字体大小 */
+        .stake-time-cell { 
+            white-space: normal; 
+        }
+        .remaining-time-cell { 
+            white-space: normal; 
+        }
+        .status-cell { 
+            font-size: 0.8rem; 
+            white-space: normal; 
+            word-break: break-word;
+            line-height: 1.3;
+        }
+        .action-cell { 
+            font-size: 0.8rem; 
+            white-space: normal; 
+            word-break: break-word;
+        }
         
+        /* 状态标签样式 */
+        .status-cell span {
+            display: inline-block;
+            max-width: 100%;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+        
+        /* 操作按钮样式 */
         .action-cell .btn-sm { 
             padding: 0.15rem 0.3rem; 
             font-size: 0.7rem; 
@@ -217,9 +174,20 @@
             max-width: 100%;
             height: auto;
             min-height: 28px;
-            margin: 2px 0;
         }
         
+        /* 已提取状态的特殊样式 */
+        .action-cell .btn-sm.btn-secondary {
+            white-space: normal;
+            word-break: break-word;
+            height: auto;
+            padding: 0.15rem 0.2rem;
+        }
+        
+        /* 调整表格行高 */
+        .table tbody tr { height: auto; min-height: 60px; }
+        
+        /* 选项卡样式 */
         .nav-tabs { border-bottom: 1px solid #334155; }
         .nav-tabs .nav-link { 
             color: #94a3b8; 
@@ -237,6 +205,7 @@
         }
         .tab-content { padding-top: 1rem; }
         
+        /* 我的质押记录子选项卡样式 */
         .sub-tabs {
             display: flex;
             gap: 10px;
@@ -270,8 +239,20 @@
             border-radius: 3px; 
             font-size: 0.8rem;
         }
+        .total-stats-card { border-left: 4px solid #3b82f6; }
+        .contract-address { 
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #60a5fa;
+            word-break: break-all;
+            background-color: #1f2937;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
         
-        /* 缓存状态提示 - 恢复 */
+        /* 缓存状态提示 */
         .cache-status {
             font-size: 0.7rem;
             color: #6b7280;
@@ -298,68 +279,17 @@
             text-align: center;
         }
         
-        /* 进度条 */
-        .progress-bar {
-            background-color: #334155;
-            height: 4px;
-            border-radius: 2px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-        .progress-fill {
-            height: 100%;
-            background-color: #38bdf8;
-            transition: width 0.3s ease;
-        }
-
-        /* 交易费用选项 */
-        .fee-options {
-            background-color: #2d3748;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-        .fee-option {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #475569;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .fee-option:hover {
-            background-color: #374151;
-        }
-        .fee-option.selected {
-            border-color: #3b82f6;
-            background-color: #1e3a5f;
-        }
-        .fee-option input[type="radio"] {
-            margin-right: 10px;
-            accent-color: #3b82f6;
-        }
-        .fee-label {
-            flex: 1;
-        }
-        .fee-name {
-            font-weight: bold;
-            color: #e2e8f0;
-        }
-        .fee-desc {
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-        .fee-price {
-            color: #38bdf8;
-            font-weight: bold;
+        /* 表格容器 */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
     </style>
 </head>
 <body>
-    <!-- 移除合约地址信息卡片，只留一个简单的标题 -->
+    <!-- 钱包连接 -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold">GANA质押管理批量操作版</h3>
+        <h3 class="fw-bold">GANA质押管理平台</h3>
         <button id="connectBtn" class="btn btn-primary" onclick="connectWallet()">连接钱包</button>
     </div>
 
@@ -391,10 +321,10 @@
         </div>
     </div>
 
-    <!-- 原有单笔质押区域 -->
+    <!-- 质押操作区域 -->
     <div class="card mb-4">
         <div class="card-body">
-            <h5 class="card-title mb-3">参与质押 (单笔)</h5>
+            <h5 class="card-title mb-3">参与质押</h5>
             <div class="row g-3 align-items-end">
                 <div class="col-md-6">
                     <label class="form-label">质押金额 (USDT)</label>
@@ -415,17 +345,10 @@
         </div>
     </div>
 
-    <!-- 新增的批量质押按钮 -->
-    <div class="mb-3">
-        <button class="btn btn-info" onclick="showBatchStakeModal()">
-            <i class="bi bi-plus-circle"></i> 批量质押 (高级)
-        </button>
-    </div>
-
-    <!-- 质押记录区域 -->
+    <!-- 质押记录区域（选项卡） -->
     <div class="card">
         <div class="card-body">
-            <!-- 选项卡导航 - 修改第四个标签为跳转链接 -->
+            <!-- 选项卡导航 -->
             <ul class="nav nav-tabs" id="stakeTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="my-stake-tab" data-bs-toggle="tab" data-bs-target="#my-stake" type="button" role="tab">我的质押记录 <span id="myStakeCount" class="badge bg-secondary ms-1">0</span></button>
@@ -438,7 +361,7 @@
             <!-- 选项卡内容 -->
             <div class="tab-content" id="stakeTabContent">
                 <!-- 我的质押记录 -->
-                <div class="tab-pane fade show active" id="my-stake" role="tabpanel">
+                <div class="tab-pane fade show active" id="my-stake" role="tabpanel" aria-labelledby="my-stake-tab">
                     <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
                         <h5 class="card-title mb-0">
                             我的质押记录
@@ -450,20 +373,6 @@
                         </div>
                     </div>
                     
-                    <!-- 批量操作栏 -->
-                    <div class="batch-actions" id="batchActions" style="display: none;">
-                        <div class="selected-count" id="selectedCount">已选择 0 条记录</div>
-                        <button class="btn btn-warning btn-sm" onclick="batchUnstake()" id="batchUnstakeBtn">
-                            批量赎回选中项
-                        </button>
-                        <button class="btn btn-secondary btn-sm" onclick="selectAllRecords()">
-                            全选
-                        </button>
-                        <button class="btn btn-secondary btn-sm" onclick="deselectAllRecords()">
-                            取消全选
-                        </button>
-                    </div>
-                    
                     <!-- 我的质押记录子选项卡 -->
                     <div class="sub-tabs">
                         <span class="sub-tab active" onclick="filterMyStakes('all')" id="filter-all">全部</span>
@@ -471,24 +380,10 @@
                         <span class="sub-tab" onclick="filterMyStakes('inactive')" id="filter-inactive">已赎回</span>
                     </div>
                     
-                    <!-- 批量操作进度条 -->
-                    <div id="batchProgress" style="display: none;" class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span id="progressText">准备中...</span>
-                            <span id="progressPercentage">0%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                    
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th class="checkbox-column">
-                                        <input type="checkbox" class="record-checkbox" id="selectAllCheckbox" onclick="toggleSelectAll()">
-                                    </th>
                                     <th>ID</th>
                                     <th>金额</th>
                                     <th>周期</th>
@@ -499,14 +394,14 @@
                                 </tr>
                             </thead>
                             <tbody id="stakeListBody">
-                                <tr><td colspan="8" class="text-center">请连接钱包查看数据</td></tr>
+                                <tr><td colspan="7" class="text-center">请连接钱包查看数据</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
                 
-                <!-- 合约总质押记录 (保留原有) -->
-                <div class="tab-pane fade" id="all-stake" role="tabpanel">
+                <!-- 合约总质押记录 -->
+                <div class="tab-pane fade" id="all-stake" role="tabpanel" aria-labelledby="all-stake-tab">
                     <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
                         <h5 class="card-title mb-0">合约总质押记录</h5>
                         <div>
@@ -578,95 +473,9 @@
             </div>
         </div>
     </div>
-
-    <!-- 批量质押模态框 - 修复版 -->
-    <div class="modal fade" id="batchStakeModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">批量质押</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">选择质押周期</label>
-                        <select class="form-select" id="batchStakePeriod" onchange="updateBatchStakeSummary()">
-                            <option value="0">1天 (0.4%)</option>
-                            <option value="1">15天 (0.8%)</option>
-                            <option value="2">30天 (1.5%)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">批量金额配置</label>
-                        <div id="stakeAmountsContainer">
-                            <div class="input-group mb-2">
-                                <input type="number" class="form-control stake-amount" placeholder="输入金额" value="1000">
-                                <button class="btn btn-outline-danger remove-amount" type="button" onclick="removeStakeAmount(this)">删除</button>
-                            </div>
-                        </div>
-                        <button class="btn btn-sm btn-outline-primary mt-2" onclick="addStakeAmount()">
-                            + 添加质押金额
-                        </button>
-                    </div>
-
-<!-- 交易费用选项 - 修复版 -->
-<div class="fee-options">
-    <label class="form-label mb-2">交易费用设置</label>
-    
-    <!-- 经济模式 -->
-    <div class="fee-option selected" onclick="selectFeeOption('slow')" id="fee-slow">
-        <input type="radio" name="feeOption" value="slow" checked onchange="selectFeeOption('slow')">
-        <div class="fee-label">
-            <div class="fee-name">经济</div>
-            <div class="fee-desc">较低费用，等待时间较长</div>
-        </div>
-        <div class="fee-price" id="feeSlowPrice">计算中...</div>
-    </div>
-    
-    <!-- 标准模式 -->
-    <div class="fee-option" onclick="selectFeeOption('standard')" id="fee-standard">
-        <input type="radio" name="feeOption" value="standard" onchange="selectFeeOption('standard')">
-        <div class="fee-label">
-            <div class="fee-name">标准 (推荐)</div>
-            <div class="fee-desc">默认费用，等待时间适中</div>
-        </div>
-        <div class="fee-price" id="feeStandardPrice">计算中...</div>
-    </div>
-    
-    <!-- 快速模式 -->
-    <div class="fee-option" onclick="selectFeeOption('fast')" id="fee-fast">
-        <input type="radio" name="feeOption" value="fast" onchange="selectFeeOption('fast')">
-        <div class="fee-label">
-            <div class="fee-name">快速</div>
-            <div class="fee-desc">较高费用，优先处理</div>
-        </div>
-        <div class="fee-price" id="feeFastPrice">计算中...</div>
-    </div>
-</div>
-                    
-                    <!-- 修复汇总信息样式 - 更清晰可见 -->
-                    <div class="summary-card">
-                        <div class="summary-item">
-                            <span>总质押笔数：</span>
-                            <span class="value" id="totalStakeCount">0</span>
-                        </div>
-                        <div class="summary-item">
-                            <span>总质押金额：</span>
-                            <span class="value" id="totalStakeAmount">0.00</span> USDT
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-success" onclick="executeBatchStake()">确认批量质押</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
-<!-- 引入 Bootstrap JS -->
+<!-- 引入 Bootstrap JS 用于选项卡功能 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
@@ -675,9 +484,7 @@
         STAKING: "0x72212F35aC448FE7763aA1BFdb360193Fa098E52",
         USDT: "0x55d398326f99059fF775485246999027B3197955",
         PAIR: "0xa2f464a2462aed49b9b31eb8861bc6b0bbb0483f",
-        TOTAL_STAKE_PAGE_SIZE: 10,
-        BATCH_SIZE: 5, // 每批处理的交易数量
-        MAX_PENDING_TXS: 3 // 最大并发交易数
+        TOTAL_STAKE_PAGE_SIZE: 10
     };
     
     // 质押周期配置 (秒)
@@ -694,7 +501,7 @@
     };
     // ===========================================
 
-    // ABIs (使用你提供的ABI)
+    // ABIs
     const ABI_ERC20 = [
         "function balanceOf(address owner) view returns (uint256)",
         "function decimals() view returns (uint8)",
@@ -702,14 +509,13 @@
         "function allowance(address owner, address spender) view returns (uint256)"
     ];
 
-    const ABI_STAKING = [{"inputs":[{"internalType":"address","name":"marketingAddress_","type":"address"},{"internalType":"address","name":"devAddress_","type":"address"},{"internalType":"address","name":"threesevenAddress_","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"uint256","name":"x","type":"uint256"},{"internalType":"uint256","name":"y","type":"uint256"}],"name":"PRBMath_MulDiv18_Overflow","type":"error"},{"inputs":[{"internalType":"uint256","name":"x","type":"uint256"},{"internalType":"uint256","name":"y","type":"uint256"},{"internalType":"uint256","name":"denominator","type":"uint256"}],"name":"PRBMath_MulDiv_Overflow","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"},{"indexed":false,"internalType":"uint40","name":"timestamp","type":"uint40"},{"indexed":false,"internalType":"uint256","name":"index","type":"uint256"}],"name":"RewardPaid","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"index","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"stakeTime","type":"uint256"}],"name":"Staked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"GANA","outputs":[{"internalType":"contract IGANA","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MIN_STAKE_USDT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"back_Fee","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"balance","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"balances","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"devAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"isPreacher","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"market_Fee","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"marketingAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"maxStakeAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"network1In","outputs":[{"internalType":"uint256","name":"value","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"index","type":"uint8"}],"name":"principalPlusRewardOfSlot","outputs":[{"internalType":"uint256","name":"reward","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"ratePerSec","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_gana","type":"address"}],"name":"setGANA","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint160","name":"_amount","type":"uint160"},{"internalType":"uint256","name":"amountOutMin","type":"uint256"},{"internalType":"uint8","name":"_stakeIndex","type":"uint8"}],"name":"stake","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"stakeCount","outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"sync","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"t_supply","outputs":[{"internalType":"uint40","name":"stakeTime","type":"uint40"},{"internalType":"uint160","name":"tamount","type":"uint160"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"threesevenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"threeseven_Fee","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"unstake","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"userIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"userStakeRecord","outputs":[{"internalType":"uint40","name":"stakeTime","type":"uint40"},{"internalType":"uint160","name":"amount","type":"uint160"},{"internalType":"bool","name":"status","type":"bool"},{"internalType":"uint8","name":"stakeIndex","type":"uint8"}],"stateMutability":"view","type":"function"}];
+    const ABI_STAKING = [{"inputs":[{"internalType":"address","name":"marketingAddress_","type":"address"},{"internalType":"address","name":"devAddress_","type":"address"},{"internalType":"address","name":"threesevenAddress_","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"uint256","name":"x","type":"uint256"},{"internalType":"uint256","name":"y","type":"uint256"}],"name":"PRBMath_MulDiv18_Overflow","type":"error"},{"inputs":[{"internalType":"uint256","name":"x","type":"uint256"},{"internalType":"uint256","name":"y","type":"uint256"},{"internalType":"uint256","name":"denominator","type":"uint256"}],"name":"PRBMath_MulDiv_Overflow","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"},{"indexed":false,"internalType":"uint40","name":"timestamp","type":"uint40"},{"indexed":false,"internalType":"uint256","name":"index","type":"uint256"}],"name":"RewardPaid","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"index","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"stakeTime","type":"uint256"}],"name":"Staked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"GANA","outputs":[{"internalType":"contract IGANA","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MIN_STAKE_USDT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"back_Fee","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"balance","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"devAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"isPreacher","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"market_Fee","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"marketingAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"maxStakeAmount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"network1In","outputs":[{"internalType":"uint256","name":"value","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"},{"internalType":"uint8","name":"index","type":"uint8"}],"name":"principalPlusRewardOfSlot","outputs":[{"internalType":"uint256","name":"reward","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"ratePerSec","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_gana","type":"address"}],"name":"setGANA","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint160","name":"_amount","type":"uint160"},{"internalType":"uint256","name":"amountOutMin","type":"uint256"},{"internalType":"uint8","name":"_stakeIndex","type":"uint8"}],"name":"stake","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"stakeCount","outputs":[{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"sync","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"t_supply","outputs":[{"internalType":"uint40","name":"stakeTime","type":"uint40"},{"internalType":"uint160","name":"tamount","type":"uint160"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"threesevenAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"threeseven_Fee","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"unstake","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"userIndex","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"userStakeRecord","outputs":[{"internalType":"uint40","name":"stakeTime","type":"uint40"},{"internalType":"uint160","name":"amount","type":"uint160"},{"internalType":"bool","name":"status","type":"bool"},{"internalType":"uint8","name":"stakeIndex","type":"uint8"}],"stateMutability":"view","type":"function"}];
 
     // 全局变量
     let provider, signer, userAddress;
     let stakingContract, usdtContract;
     let autoRefreshInterval = null;
     let countdownTimers = {};
-    let batchStakeModal;
     
     // 总质押记录相关变量
     let allStakeData = [];
@@ -723,15 +529,7 @@
     let pendingUpdates = new Set();
     let currentFilter = 'all';
 
-    // 交易费用相关
-    let currentFeeOption = 'slow';  // 改为 'standard'标准
-    let gasPrices = {
-        standard: null,
-        slow: null,
-        fast: null
-    };
-
-    // ================= 工具函数 =================
+    // 工具函数
     function formatAmountInteger(wei) {
         try {
             const val = ethers.formatUnits(wei, 18);
@@ -750,6 +548,7 @@
         }
     }
 
+    // 显示剩余时间 - 分两行：天和小时在上面，分和秒在下面
     function formatTimeRemainingSplit(seconds) {
         if (seconds <= 0) return { top: "0秒", bottom: "" };
         
@@ -774,6 +573,7 @@
         return { top: topPart || "0小时", bottom: bottomPart || "0秒" };
     }
     
+    // 返回日期和时间分开
     function formatStakeTimeSplit(timestamp) {
         try {
             const date = new Date(timestamp * 1000);
@@ -803,75 +603,7 @@
         return address.substring(0, 6) + '...' + address.substring(address.length - 4);
     }
 
-    // ================= 获取Gas价格 =================
-    async function updateGasPrices() {
-        if (!provider) return;
-        
-        try {
-            const feeData = await provider.getFeeData();
-            const baseGasPrice = feeData.gasPrice || ethers.parseUnits('5', 'gwei');
-            
-            // BSC推荐Gas价格配置
-            gasPrices = {
-                slow: baseGasPrice, // 经济：基础价格
-                standard: baseGasPrice * 12n / 10n, // 标准：1.2倍
-                fast: baseGasPrice * 15n / 10n // 快速：1.5倍
-            };
-            
-            // 更新显示
-            document.getElementById('feeSlowPrice').textContent = formatGwei(gasPrices.slow) + ' Gwei';
-            document.getElementById('feeStandardPrice').textContent = formatGwei(gasPrices.standard) + ' Gwei';
-            document.getElementById('feeFastPrice').textContent = formatGwei(gasPrices.fast) + ' Gwei';
-            
-        } catch (error) {
-            console.error("获取Gas价格失败:", error);
-        }
-    }
-    
-    function formatGwei(wei) {
-        return (Number(ethers.formatUnits(wei, 'gwei'))).toFixed(1);
-    }
-    
-    function selectFeeOption(option) {
-        currentFeeOption = option;
-        
-        // 更新UI
-        document.getElementById('fee-standard').classList.remove('selected');
-        document.getElementById('fee-slow').classList.remove('selected');
-        document.getElementById('fee-fast').classList.remove('selected');
-        document.getElementById(`fee-${option}`).classList.add('selected');
-        
-        document.querySelectorAll('input[name="feeOption"]').forEach(radio => {
-            radio.checked = (radio.value === option);
-        });
-    }
-
-    // ================= 获取交易覆盖 =================
-    async function getTransactionOverrides() {
-        const overrides = {};
-        
-        if (gasPrices[currentFeeOption]) {
-            overrides.gasPrice = gasPrices[currentFeeOption];
-        }
-        
-        return overrides;
-    }
-
-    // ================= 缓存状态更新 =================
-    function updateCacheStatus() {
-        const cacheStatusEl = document.getElementById('cacheStatus');
-        if (!cacheStatusEl) return;
-        const now = Date.now();
-        if (lastFetchTime === 0) {
-            cacheStatusEl.textContent = '未加载';
-        } else if (pendingUpdates.size > 0) {
-            cacheStatusEl.textContent = `🔄 更新中 (${pendingUpdates.size}条)`;
-        } else {
-            cacheStatusEl.textContent = `⏱️ ${Math.round((now - lastFetchTime)/1000)}秒前更新`;
-        }
-    }
-
-    // ================= 连接钱包 =================
+    // 连接钱包
     async function connectWallet() {
         if (!window.ethereum) {
             alert("请安装 MetaMask!");
@@ -889,84 +621,26 @@
             usdtContract = new ethers.Contract(CONFIG.USDT, ABI_ERC20, signer);
 
             await refreshData();
-            await updateGasPrices(); // 更新Gas价格
         } catch (error) {
             console.error("连接失败:", error);
             alert("连接钱包失败: " + (error.message || error));
         }
     }
 
-    // ================= 单笔质押 =================
-    async function handleStake(stakeIndex, durationDays) {
-        if (!userAddress) return alert("请先连接钱包");
-        const amountStr = document.getElementById('stakeAmount').value;
-        if (!amountStr || parseFloat(amountStr) <= 0) return alert("请输入有效金额");
-        const amountWei = ethers.parseUnits(amountStr, 18);
-        
-        const buttons = document.querySelectorAll('.staking-btn-group .btn');
-        const originalTexts = [];
-        
-        try {
-            buttons.forEach(btn => {
-                originalTexts.push(btn.textContent);
-                btn.disabled = true;
-            });
-            
-            const currentBtn = event.target;
-            currentBtn.textContent = "检查限额...";
-
-            const allowance = await usdtContract.allowance(userAddress, CONFIG.STAKING);
-            if (allowance < amountWei) {
-                currentBtn.textContent = "正在授权 USDT...";
-                const overrides = await getTransactionOverrides();
-                const txApprove = await usdtContract.approve(CONFIG.STAKING, ethers.MaxUint256, overrides); 
-                await txApprove.wait();
-            }
-
-            currentBtn.textContent = "正在质押...";
-            const overrides = await getTransactionOverrides();
-            const txStake = await stakingContract.stake(amountWei, 0, stakeIndex, overrides);
-            await txStake.wait();
-            
-            const newCount = await stakingContract.stakeCount(userAddress);
-            const newIndex = Number(newCount) - 1;
-            pendingUpdates.add(newIndex.toString());
-            
-            await refreshStatsOnly();
-            await refreshChangedRecords();
-            
-            alert(`质押成功！周期：${durationDays}天`);
-        } catch (error) {
-            console.error(error);
-            alert("质押失败: " + (error.message || error));
-        } finally {
-            buttons.forEach((btn, index) => {
-                btn.disabled = false;
-                btn.textContent = originalTexts[index];
-            });
+    // 更新缓存状态
+    function updateCacheStatus() {
+        const cacheStatusEl = document.getElementById('cacheStatus');
+        if (!cacheStatusEl) return;
+        const now = Date.now();
+        if (lastFetchTime === 0) {
+            cacheStatusEl.textContent = '未加载';
+        } else if (pendingUpdates.size > 0) {
+            cacheStatusEl.textContent = `🔄 更新中 (${pendingUpdates.size}条)`;
+        } else {
+            cacheStatusEl.textContent = `⏱️ ${Math.round((now - lastFetchTime)/1000)}秒前更新`;
         }
     }
 
-    // ================= 刷新统计 =================
-    async function refreshStatsOnly() {
-        if (!userAddress) return;
-        try {
-            const [myBal, stakedBal, poolBal, totalStaked] = await Promise.all([
-                usdtContract.balanceOf(userAddress),
-                stakingContract.balanceOf(userAddress),
-                usdtContract.balanceOf(CONFIG.PAIR),
-                stakingContract.totalSupply()
-            ]);
-            document.getElementById('myBalance').innerText = formatAmountTwoDecimals(myBal);
-            document.getElementById('stakedBalance').innerText = formatAmountTwoDecimals(stakedBal);
-            document.getElementById('poolBalance').innerText = formatAmountTwoDecimals(poolBal);
-            document.getElementById('totalStaked').innerText = formatAmountTwoDecimals(totalStaked);
-        } catch (error) {
-            console.error("统计刷新失败:", error);
-        }
-    }
-
-    // ================= 更新单条记录 =================
     async function updateSingleRecord(index) {
         if (!userAddress || !stakingContract) return null;
         try {
@@ -995,18 +669,17 @@
         }
     }
 
-    // ================= 刷新变更记录 =================
     async function refreshChangedRecords() {
         if (!userAddress || !stakingContract) return;
         const changedIndices = Array.from(pendingUpdates);
         if (changedIndices.length === 0) return;
+        updateCacheStatus();
         await Promise.all(changedIndices.map(index => updateSingleRecord(parseInt(index))));
         pendingUpdates.clear();
         renderStakeListFromCache();
         updateCacheStatus();
     }
 
-    // ================= 过滤 =================
     function filterMyStakes(filter) {
         currentFilter = filter;
         document.getElementById('filter-all').classList.remove('active');
@@ -1016,7 +689,6 @@
         renderStakeListFromCache();
     }
 
-    // ================= 渲染列表 =================
     function renderStakeListFromCache() {
         const tbody = document.getElementById('stakeListBody');
         if (!tbody) return;
@@ -1029,7 +701,7 @@
         }
         
         if (filteredRecords.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center">暂无质押记录</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">暂无质押记录</td></tr>';
             document.getElementById('myStakeCount').textContent = myStakeRecords.length;
             return;
         }
@@ -1047,13 +719,11 @@
             let statusHtml = '';
             let actionHtml = '';
             let timeRemainingHtml = '';
-            let checkboxDisabled = true;
 
             if (record.isActive) {
                 statusHtml = '<span class="text-muted">已提取</span>';
                 actionHtml = '-';
                 timeRemainingHtml = '<span class="text-muted">-</span>';
-                checkboxDisabled = true;
             } else {
                 if (isLocked) {
                     statusHtml = '<span class="text-danger">锁仓中</span>';
@@ -1064,28 +734,20 @@
                             <span class="remaining-bottom">${timeRemainingObj.bottom}</span>
                         </div>
                     `;
-                    checkboxDisabled = true;
+                    startCountdown(record.index, record.timeRemaining);
                 } else if (isUnlocked) {
                     statusHtml = '<span class="text-success">可赎回</span>';
-                    // 恢复为"立即赎回"
-                    actionHtml = `<button class="btn btn-sm btn-warning" onclick="handleUnstake(${record.index})">立即赎回</button>`;
+                    actionHtml = `<button class="btn btn-sm btn-warning" id="unstake-btn-${record.index}" onclick="handleUnstake(${record.index})">立即赎回</button>`;
                     timeRemainingHtml = '<span class="remaining-top unlocked">已解锁</span>';
-                    checkboxDisabled = false;
                 } else {
                     statusHtml = '<span class="text-warning">未知</span>';
                     actionHtml = '-';
                     timeRemainingHtml = '-';
-                    checkboxDisabled = true;
                 }
             }
 
             html += `
                 <tr id="record-row-${record.index}" ${pendingUpdates.has(record.index.toString()) ? 'class="record-highlight"' : ''}>
-                    <td class="checkbox-column">
-                        <input type="checkbox" class="record-checkbox" value="${record.index}" 
-                               ${checkboxDisabled ? 'disabled' : ''} 
-                               onchange="updateBatchActionsVisibility()">
-                    </td>
                     <td><span class="id-value">${record.index}</span></td>
                     <td><span class="amount-value">${record.amount}</span></td>
                     <td><span class="badge-duration">${durationLabel}</span></td>
@@ -1105,44 +767,92 @@
         tbody.innerHTML = html;
         document.getElementById('myStakeCount').textContent = myStakeRecords.length;
         
-        document.getElementById('selectAllCheckbox').checked = false;
-        
         setTimeout(() => {
             document.querySelectorAll('.record-highlight').forEach(el => el.classList.remove('record-highlight'));
         }, 1000);
     }
 
-    // ================= 单笔赎回 =================
+    // 质押操作
+    async function handleStake(stakeIndex, durationDays) {
+        if (!userAddress) return alert("请先连接钱包");
+        const amountStr = document.getElementById('stakeAmount').value;
+        if (!amountStr || parseFloat(amountStr) <= 0) return alert("请输入有效金额");
+        const amountWei = ethers.parseUnits(amountStr, 18);
+        
+        const buttons = document.querySelectorAll('.staking-btn-group .btn');
+        const originalTexts = [];
+        
+        try {
+            buttons.forEach(btn => {
+                originalTexts.push(btn.textContent);
+                btn.disabled = true;
+            });
+            
+            const currentBtn = event.target;
+            currentBtn.textContent = "检查限额...";
+
+            const allowance = await usdtContract.allowance(userAddress, CONFIG.STAKING);
+            if (allowance < amountWei) {
+                currentBtn.textContent = "正在授权 USDT...";
+                const txApprove = await usdtContract.approve(CONFIG.STAKING, ethers.MaxUint256); 
+                await txApprove.wait();
+            }
+
+            currentBtn.textContent = "正在质押...";
+            const txStake = await stakingContract.stake(amountWei, 0, stakeIndex);
+            await txStake.wait();
+            
+            const newCount = await stakingContract.stakeCount(userAddress);
+            const newIndex = Number(newCount) - 1;
+            pendingUpdates.add(newIndex.toString());
+            
+            await refreshStatsOnly();
+            await refreshChangedRecords();
+            
+            alert(`质押成功！周期：${durationDays}天`);
+        } catch (error) {
+            console.error(error);
+            alert("质押失败: " + (error.message || error));
+        } finally {
+            buttons.forEach((btn, index) => {
+                btn.disabled = false;
+                btn.textContent = originalTexts[index];
+            });
+        }
+    }
+
+    async function refreshStatsOnly() {
+        if (!userAddress) return;
+        try {
+            const [myBal, stakedBal, poolBal, totalStaked] = await Promise.all([
+                usdtContract.balanceOf(userAddress),
+                stakingContract.balanceOf(userAddress),
+                usdtContract.balanceOf(CONFIG.PAIR),
+                stakingContract.totalSupply()
+            ]);
+            document.getElementById('myBalance').innerText = formatAmountTwoDecimals(myBal);
+            document.getElementById('stakedBalance').innerText = formatAmountTwoDecimals(stakedBal);
+            document.getElementById('poolBalance').innerText = formatAmountTwoDecimals(poolBal);
+            document.getElementById('totalStaked').innerText = formatAmountTwoDecimals(totalStaked);
+        } catch (error) {
+            console.error("统计刷新失败:", error);
+        }
+    }
+
     async function handleUnstake(index) {
         if (!userAddress) return;
-            
-    // 添加这行，设置默认费用选项为经济模式
-    selectFeeOption('slow');
-    
         const btn = document.getElementById(`unstake-btn-${index}`);
         if(btn) {
             btn.disabled = true;
             btn.innerText = "处理中...";
         }
         try {
-            showBatchProgress(1);
-            updateProgressText("正在赎回...", 30);
-            
-            const overrides = await getTransactionOverrides();
-            const tx = await stakingContract.unstake(index, overrides);
-            
-            updateProgressText("等待确认...", 60);
+            const tx = await stakingContract.unstake(index);
             await tx.wait();
-            
             pendingUpdates.add(index.toString());
-            
-            updateProgressText("更新数据...", 90);
-            await refreshChangedRecords();
             await refreshStatsOnly();
-            
-            updateProgressText("赎回成功！", 100);
+            await refreshChangedRecords();
             alert("赎回成功！");
-            
         } catch (error) {
             console.error(error);
             alert("赎回失败: " + (error.message || error));
@@ -1150,14 +860,9 @@
                 btn.disabled = false;
                 btn.innerText = "赎回";
             }
-        } finally {
-            setTimeout(() => {
-                hideBatchProgress();
-            }, 2000);
         }
     }
 
-    // ================= 刷新数据 =================
     async function refreshData() {
         if (!userAddress) return;
         const btn = document.querySelector('button[onclick="refreshData()"]');
@@ -1182,394 +887,38 @@
         }
     }
 
-    // ================= 批量质押相关 =================
-    function showBatchStakeModal() {
-        if (!userAddress) {
-            alert("请先连接钱包");
-            return;
-        }
+    function startCountdown(id, initialSeconds) {
+        let remaining = initialSeconds;
+        const countdownElement = document.getElementById(`countdown-${id}`);
+        if (!countdownElement) return;
         
-        if (!batchStakeModal) {
-            batchStakeModal = new bootstrap.Modal(document.getElementById('batchStakeModal'));
-        }
+        // 找到对应的父元素
+        const cellElement = countdownElement.closest('.remaining-time-cell');
         
-        document.getElementById('stakeAmountsContainer').innerHTML = `
-            <div class="input-group mb-2">
-                <input type="number" class="form-control stake-amount" placeholder="输入金额" value="1000">
-                <button class="btn btn-outline-danger remove-amount" type="button" onclick="removeStakeAmount(this)">删除</button>
-            </div>
-        `;
-        
-        updateGasPrices(); // 更新Gas价格
-        updateBatchStakeSummary();
-            
-    // 添加这行，设置默认选中经济模式
-    selectFeeOption('slow');  // 添加这行代码
-        
-        batchStakeModal.show();
-    }
-    
-    function addStakeAmount() {
-        const container = document.getElementById('stakeAmountsContainer');
-        const newInput = document.createElement('div');
-        newInput.className = 'input-group mb-2';
-        newInput.innerHTML = `
-            <input type="number" class="form-control stake-amount" placeholder="输入金额" value="1000">
-            <button class="btn btn-outline-danger remove-amount" type="button" onclick="removeStakeAmount(this)">删除</button>
-        `;
-        container.appendChild(newInput);
-        updateBatchStakeSummary();
-    }
-    
-    function removeStakeAmount(btn) {
-        const container = document.getElementById('stakeAmountsContainer');
-        if (container.children.length > 1) {
-            btn.closest('.input-group').remove();
-            updateBatchStakeSummary();
-        } else {
-            alert("至少需要保留一个质押金额");
-        }
-    }
-    
-    function updateBatchStakeSummary() {
-        const amounts = document.querySelectorAll('.stake-amount');
-        let total = 0;
-        let count = 0;
-        
-        amounts.forEach(input => {
-            const val = parseFloat(input.value) || 0;
-            if (val > 0) {
-                total += val;
-                count++;
-            }
-        });
-        
-        document.getElementById('totalStakeCount').textContent = count;
-        document.getElementById('totalStakeAmount').textContent = total.toFixed(2);
-    }
-    
-    document.addEventListener('input', function(e) {
-        if (e.target.classList.contains('stake-amount')) {
-            updateBatchStakeSummary();
-        }
-    });
-    
-    async function executeBatchStake() {
-        if (!userAddress) return alert("请先连接钱包");
-        
-        const stakeIndex = parseInt(document.getElementById('batchStakePeriod').value);
-        const amountInputs = document.querySelectorAll('.stake-amount');
-        const amounts = [];
-        
-        for (const input of amountInputs) {
-            const val = parseFloat(input.value);
-            if (val > 0) {
-                amounts.push(val);
-            }
-        }
-        
-        if (amounts.length === 0) {
-            return alert("请至少输入一个有效金额");
-        }
-        
-        const totalAmount = amounts.reduce((sum, val) => sum + val, 0);
-        const totalAmountWei = ethers.parseUnits(totalAmount.toString(), 18);
-        
-        batchStakeModal.hide();
-        
-        showBatchProgress(amounts.length);
-        
-        try {
-            updateProgressText("检查授权...", 0);
-            const allowance = await usdtContract.allowance(userAddress, CONFIG.STAKING);
-            
-            // 一次性授权，避免多次授权
-            if (allowance < totalAmountWei) {
-                updateProgressText("正在一次性授权 USDT...", 5);
-                const overrides = await getTransactionOverrides();
-                const txApprove = await usdtContract.approve(CONFIG.STAKING, ethers.MaxUint256, overrides);
-                await txApprove.wait();
-                updateProgressText("授权完成", 10);
+        const timer = setInterval(() => {
+            remaining--;
+            if (remaining <= 0) {
+                clearInterval(timer);
+                pendingUpdates.add(id.toString());
+                refreshChangedRecords();
+                return;
             }
             
-            const batchSize = CONFIG.BATCH_SIZE;
-            let successCount = 0;
-            let failedAmounts = [];
-            let pendingTxs = [];
-            
-            for (let i = 0; i < amounts.length; i++) {
-                // 控制并发数量
-                while (pendingTxs.length >= CONFIG.MAX_PENDING_TXS) {
-                    // 等待最早的一个交易完成
-                    const completedTx = await Promise.race(pendingTxs.map(p => p.catch(e => e)));
-                    pendingTxs = pendingTxs.filter(p => !p.isCompleted);
-                    successCount++;
+            // 更新显示
+            if (cellElement) {
+                const timeRemainingObj = formatTimeRemainingSplit(remaining);
+                const topSpan = cellElement.querySelector('.remaining-top');
+                const bottomSpan = cellElement.querySelector('.remaining-bottom');
+                if (topSpan && bottomSpan) {
+                    topSpan.textContent = timeRemainingObj.top;
+                    bottomSpan.textContent = timeRemainingObj.bottom;
                 }
-                
-                const amount = amounts[i];
-                const amountWei = ethers.parseUnits(amount.toString(), 18);
-                
-                updateProgressText(
-                    `提交第 ${i+1}/${amounts.length} 笔质押...`,
-                    Math.round((i / amounts.length) * 70) + 10
-                );
-                
-                // 创建交易Promise
-                const txPromise = (async () => {
-                    try {
-                        const overrides = await getTransactionOverrides();
-                        const tx = await stakingContract.stake(amountWei, 0, stakeIndex, overrides);
-                        await tx.wait();
-                        return { success: true, amount };
-                    } catch (error) {
-                        console.error(`质押 ${amount} USDT 失败:`, error);
-                        failedAmounts.push(amount);
-                        return { success: false, amount };
-                    }
-                })();
-                
-                // 标记完成状态
-                txPromise.isCompleted = false;
-                txPromise.finally(() => { txPromise.isCompleted = true; });
-                
-                pendingTxs.push(txPromise);
-                
-                // 小额延迟避免请求过于密集
-                await new Promise(resolve => setTimeout(resolve, 100));
             }
-            
-            // 等待所有剩余交易完成
-            updateProgressText("等待所有交易确认...", 80);
-            await Promise.all(pendingTxs.map(p => p.catch(e => e)));
-            successCount = amounts.length - failedAmounts.length;
-            
-            updateProgressText("更新数据中...", 90);
-            await refreshData();
-            
-            updateProgressText("批量质押完成！", 100);
-            
-            let resultMsg = `批量质押完成！成功: ${successCount} 笔`;
-            if (failedAmounts.length > 0) {
-                resultMsg += `\n失败: ${failedAmounts.length} 笔 (金额: ${failedAmounts.join(', ')})`;
-            }
-            alert(resultMsg);
-            
-        } catch (error) {
-            console.error("批量质押失败:", error);
-            alert("批量质押失败: " + (error.message || error));
-        } finally {
-            setTimeout(() => {
-                hideBatchProgress();
-            }, 3000);
-        }
-    }
-    
-    // ================= 批量赎回 =================
-    async function batchUnstake() {
-    // 添加这行，设置默认费用选项为经济模式
-    selectFeeOption('slow');
-    
-        const checkboxes = document.querySelectorAll('.record-checkbox:checked');
-        const selectedIndices = Array.from(checkboxes)
-            .map(cb => parseInt(cb.value))
-            .filter(index => !isNaN(index));
-        
-        if (selectedIndices.length === 0) {
-            return alert("请选择要赎回的质押记录");
-        }
-        
-        const validIndices = selectedIndices.filter(index => {
-            const record = myStakeRecords.find(r => r.index === index);
-            return record && !record.isActive && record.timeRemaining <= 0;
-        });
-        
-        if (validIndices.length === 0) {
-            return alert("选中的记录中没有可赎回的项（请确保记录已解锁且未赎回）");
-        }
-        
-        if (!confirm(`确定要批量赎回 ${validIndices.length} 笔质押记录吗？`)) {
-            return;
-        }
-        
-        showBatchProgress(validIndices.length);
-        
-        try {
-            const batchSize = CONFIG.BATCH_SIZE;
-            let successCount = 0;
-            let failedIndices = [];
-            let pendingTxs = [];
-            
-            for (let i = 0; i < validIndices.length; i++) {
-                // 控制并发数量
-                while (pendingTxs.length >= CONFIG.MAX_PENDING_TXS) {
-                    const completedTx = await Promise.race(pendingTxs.map(p => p.catch(e => e)));
-                    pendingTxs = pendingTxs.filter(p => !p.isCompleted);
-                    successCount++;
-                }
-                
-                const index = validIndices[i];
-                
-                updateProgressText(
-                    `提交第 ${i+1}/${validIndices.length} 笔赎回...`,
-                    Math.round((i / validIndices.length) * 80)
-                );
-                
-                const txPromise = (async () => {
-                    try {
-                        const overrides = await getTransactionOverrides();
-                        const tx = await stakingContract.unstake(index, overrides);
-                        await tx.wait();
-                        pendingUpdates.add(index.toString());
-                        return { success: true, index };
-                    } catch (error) {
-                        console.error(`赎回记录 ${index} 失败:`, error);
-                        failedIndices.push(index);
-                        return { success: false, index };
-                    }
-                })();
-                
-                txPromise.isCompleted = false;
-                txPromise.finally(() => { txPromise.isCompleted = true; });
-                
-                pendingTxs.push(txPromise);
-                
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-            
-            updateProgressText("等待所有赎回确认...", 85);
-            await Promise.all(pendingTxs.map(p => p.catch(e => e)));
-            successCount = validIndices.length - failedIndices.length;
-            
-            updateProgressText("更新数据中...", 90);
-            await refreshChangedRecords();
-            await refreshStatsOnly();
-            
-            updateProgressText("批量赎回完成！", 100);
-            
-            deselectAllRecords();
-            
-            let resultMsg = `批量赎回完成！成功: ${successCount} 笔`;
-            if (failedIndices.length > 0) {
-                resultMsg += `\n失败: ${failedIndices.length} 笔 (记录ID: ${failedIndices.join(', ')})`;
-            }
-            alert(resultMsg);
-            
-        } catch (error) {
-            console.error("批量赎回失败:", error);
-            alert("批量赎回失败: " + (error.message || error));
-        } finally {
-            setTimeout(() => {
-                hideBatchProgress();
-            }, 3000);
-        }
-    }
-    
-    // ================= 复选框相关 =================
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAllCheckbox').checked;
-        const checkboxes = document.querySelectorAll('.record-checkbox:not([disabled])');
-        checkboxes.forEach(cb => {
-            cb.checked = selectAll;
-        });
-        updateBatchActionsVisibility();
-    }
-    
-    function selectAllRecords() {
-        const checkboxes = document.querySelectorAll('.record-checkbox:not([disabled])');
-        checkboxes.forEach(cb => {
-            cb.checked = true;
-        });
-        document.getElementById('selectAllCheckbox').checked = true;
-        updateBatchActionsVisibility();
-    }
-    
-    function deselectAllRecords() {
-        const checkboxes = document.querySelectorAll('.record-checkbox');
-        checkboxes.forEach(cb => {
-            cb.checked = false;
-        });
-        document.getElementById('selectAllCheckbox').checked = false;
-        updateBatchActionsVisibility();
-    }
-    
-    function updateBatchActionsVisibility() {
-        const checkboxes = document.querySelectorAll('.record-checkbox:checked');
-        const count = checkboxes.length;
-        const batchActions = document.getElementById('batchActions');
-        const batchUnstakeBtn = document.getElementById('batchUnstakeBtn');
-        
-        if (count > 0) {
-            batchActions.style.display = 'flex';
-            document.getElementById('selectedCount').textContent = `已选择 ${count} 条记录`;
-            
-            const allUnlocked = Array.from(checkboxes).every(cb => {
-                const index = parseInt(cb.value);
-                const record = myStakeRecords.find(r => r.index === index);
-                return record && !record.isActive && record.timeRemaining <= 0;
-            });
-            
-            batchUnstakeBtn.disabled = !allUnlocked;
-            if (!allUnlocked) {
-                batchUnstakeBtn.title = "只能赎回已解锁且未提取的记录";
-            }
-        } else {
-            batchActions.style.display = 'none';
-        }
-    }
-    
-    // ================= 进度条 =================
-    function showBatchProgress(total) {
-        const progressEl = document.getElementById('batchProgress');
-        progressEl.style.display = 'block';
-        updateProgressText(`准备处理 ${total} 笔交易...`, 0);
-    }
-    
-    function updateProgressText(text, percentage) {
-        document.getElementById('progressText').textContent = text;
-        document.getElementById('progressPercentage').textContent = percentage + '%';
-        document.getElementById('progressFill').style.width = percentage + '%';
-    }
-    
-    function hideBatchProgress() {
-        document.getElementById('batchProgress').style.display = 'none';
+        }, 1000);
+        countdownTimers[id] = timer;
     }
 
-    // ================= 自动刷新 =================
-    function startAutoRefresh() {
-        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-        autoRefreshInterval = setInterval(async () => {
-            if (userAddress) {
-                const newCount = await stakingContract.stakeCount(userAddress);
-                if (myStakeRecords.length !== Number(newCount)) {
-                    for (let i = 0; i < Number(newCount); i++) {
-                        if (!myStakeRecords.some(r => r.index === i)) {
-                            pendingUpdates.add(i.toString());
-                        }
-                    }
-                }
-                await refreshChangedRecords();
-                await refreshStatsOnly();
-            }
-        }, 30000);
-    }
-    
-    function toggleAutoRefresh() {
-        const btn = document.getElementById('autoRefreshBtn');
-        if (autoRefreshInterval) {
-            clearInterval(autoRefreshInterval);
-            autoRefreshInterval = null;
-            btn.textContent = "自动刷新: 关闭";
-            btn.classList.remove('btn-info');
-            btn.classList.add('btn-outline-info');
-        } else {
-            startAutoRefresh();
-            btn.textContent = "自动刷新: 开启";
-            btn.classList.remove('btn-outline-info');
-            btn.classList.add('btn-info');
-        }
-    }
-
-    // ================= 全网质押记录刷新 =================
+    // 全网质押记录刷新函数
     async function refreshAllStakeData() {
         if (!stakingContract) {
             alert("请先连接钱包");
@@ -1691,6 +1040,7 @@
         }
     }
     
+    // 计算统计
     function calculateAllStats() {
         if (allStakeData.length === 0) {
             document.getElementById('totalUsers').textContent = '0';
@@ -1714,6 +1064,7 @@
         document.getElementById('avgStakeAmount').textContent = (totalAmount / allStakeData.length).toFixed(2);
     }
     
+    // 渲染总质押列表
     function renderAllStakeList() {
         const tbody = document.getElementById('allStakeListBody');
         if (allStakeData.length === 0) {
@@ -1779,13 +1130,48 @@
         }
     }
     
-    // ================= 清理定时器 =================
+    // 自动刷新
+    function startAutoRefresh() {
+        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+        autoRefreshInterval = setInterval(async () => {
+            if (userAddress) {
+                const newCount = await stakingContract.stakeCount(userAddress);
+                if (myStakeRecords.length !== Number(newCount)) {
+                    for (let i = 0; i < Number(newCount); i++) {
+                        if (!myStakeRecords.some(r => r.index === i)) {
+                            pendingUpdates.add(i.toString());
+                        }
+                    }
+                }
+                await refreshChangedRecords();
+                await refreshStatsOnly();
+            }
+        }, 30000);
+    }
+
+    function toggleAutoRefresh() {
+        const btn = document.getElementById('autoRefreshBtn');
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+            autoRefreshInterval = null;
+            btn.textContent = "自动刷新: 关闭";
+            btn.classList.remove('btn-info');
+            btn.classList.add('btn-outline-info');
+        } else {
+            startAutoRefresh();
+            btn.textContent = "自动刷新: 开启";
+            btn.classList.remove('btn-outline-info');
+            btn.classList.add('btn-info');
+        }
+    }
+
+    // 清理定时器
     window.addEventListener('beforeunload', () => {
         if (autoRefreshInterval) clearInterval(autoRefreshInterval);
         Object.keys(countdownTimers).forEach(id => clearInterval(countdownTimers[id]));
     });
-    
-    // ================= 初始化 =================
+
+    // 初始化
     window.addEventListener('load', () => {
         if (typeof window.ethereum !== 'undefined') {
             window.ethereum.request({ method: 'eth_accounts' })
@@ -1793,7 +1179,8 @@
                     if (accounts.length > 0) connectWallet();
                 });
         }
-        document.getElementById('stakingContractAddress')?.remove(); // 移除合约地址显示
+        document.getElementById('stakingContractAddress').textContent = CONFIG.STAKING;
+        document.getElementById('lpContractAddress').textContent = CONFIG.PAIR;
     });
 </script>
 </body>
