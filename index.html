@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GANA质押管理平台 - 批量操作版</title>
+    <title>GANA质押管理平台批量操作</title>
     <!-- 引入 Bootstrap 用于快速布局 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- 引入 Ethers.js V6 -->
@@ -91,7 +91,7 @@
         .summary-item .value {
             color: #38bdf8;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
         
         .warning-box {
@@ -132,12 +132,12 @@
         /* 列宽设置 - 恢复原来的8列表格 */
         .table th:nth-child(1), .table td:nth-child(1) { width: 5%; }  /* 复选框 */
         .table th:nth-child(2), .table td:nth-child(2) { width: 5%; }  /* ID */
-        .table th:nth-child(3), .table td:nth-child(3) { width: 12%; } /* 金额 */
-        .table th:nth-child(4), .table td:nth-child(4) { width: 8%; }  /* 周期 */
-        .table th:nth-child(5), .table td:nth-child(5) { width: 18%; } /* 质押时间 */
-        .table th:nth-child(6), .table td:nth-child(6) { width: 18%; } /* 剩余时间 */
+        .table th:nth-child(3), .table td:nth-child(3) { width: 15%; } /* 金额 */
+        .table th:nth-child(4), .table td:nth-child(4) { width: 9%; }  /* 周期 */
+        .table th:nth-child(5), .table td:nth-child(5) { width: 20%; } /* 质押时间 */
+        .table th:nth-child(6), .table td:nth-child(6) { width: 20%; } /* 剩余时间 */
         .table th:nth-child(7), .table td:nth-child(7) { width: 10%; } /* 状态 */
-        .table th:nth-child(8), .table td:nth-child(8) { width: 24%; } /* 操作 */
+        .table th:nth-child(8), .table td:nth-child(8) { width: 16%; } /* 操作 */
 
         .id-value {
             font-size: 0.7rem;
@@ -316,7 +316,7 @@
 <body>
     <!-- 移除合约地址信息卡片，只留一个简单的标题 -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold">GANA质押管理平台 - 批量操作版</h3>
+        <h3 class="fw-bold">GANA质押管理批量操作版</h3>
         <button id="connectBtn" class="btn btn-primary" onclick="connectWallet()">连接钱包</button>
     </div>
 
@@ -386,9 +386,6 @@
             <ul class="nav nav-tabs" id="stakeTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="my-stake-tab" data-bs-toggle="tab" data-bs-target="#my-stake" type="button" role="tab">我的质押记录 <span id="myStakeCount" class="badge bg-secondary ms-1">0</span></button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="all-stake-tab" data-bs-toggle="tab" data-bs-target="#all-stake" type="button" role="tab">合约总质押记录</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <a class="nav-link" href="https://www.ganaweb3.top" target="_blank" role="tab">📊 质押数据平台</a>
