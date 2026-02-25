@@ -610,34 +610,40 @@
                         </button>
                     </div>
 
-                    <!-- 交易费用选项 - 新增 -->
-                    <div class="fee-options">
-                        <label class="form-label mb-2">交易费用设置</label>
-                        <div class="fee-option selected" onclick="selectFeeOption('slow')" id="fee-slow">
-                            <input type="radio" name="feeOption" value="slow" checked onchange="selectFeeOption('slow')">
-                            <div class="fee-label">
-                                <div class="fee-name">标准 (推荐)</div>
-                                <div class="fee-desc">默认费用，等待时间适中</div>
-                            </div>
-                            <div class="fee-price" id="feeStandardPrice">计算中...</div>
-                        </div>
-                        <div class="fee-option" onclick="selectFeeOption('slow')" id="fee-slow">
-                            <input type="radio" name="feeOption" value="slow" onchange="selectFeeOption('slow')">
-                            <div class="fee-label">
-                                <div class="fee-name">经济</div>
-                                <div class="fee-desc">较低费用，等待时间较长</div>
-                            </div>
-                            <div class="fee-price" id="feeSlowPrice">计算中...</div>
-                        </div>
-                        <div class="fee-option" onclick="selectFeeOption('fast')" id="fee-fast">
-                            <input type="radio" name="feeOption" value="fast" onchange="selectFeeOption('fast')">
-                            <div class="fee-label">
-                                <div class="fee-name">快速</div>
-                                <div class="fee-desc">较高费用，优先处理</div>
-                            </div>
-                            <div class="fee-price" id="feeFastPrice">计算中...</div>
-                        </div>
-                    </div>
+<!-- 交易费用选项 - 修复版 -->
+<div class="fee-options">
+    <label class="form-label mb-2">交易费用设置</label>
+    
+    <!-- 经济模式 -->
+    <div class="fee-option selected" onclick="selectFeeOption('slow')" id="fee-slow">
+        <input type="radio" name="feeOption" value="slow" checked onchange="selectFeeOption('slow')">
+        <div class="fee-label">
+            <div class="fee-name">经济</div>
+            <div class="fee-desc">较低费用，等待时间较长</div>
+        </div>
+        <div class="fee-price" id="feeSlowPrice">计算中...</div>
+    </div>
+    
+    <!-- 标准模式 -->
+    <div class="fee-option" onclick="selectFeeOption('standard')" id="fee-standard">
+        <input type="radio" name="feeOption" value="standard" onchange="selectFeeOption('standard')">
+        <div class="fee-label">
+            <div class="fee-name">标准 (推荐)</div>
+            <div class="fee-desc">默认费用，等待时间适中</div>
+        </div>
+        <div class="fee-price" id="feeStandardPrice">计算中...</div>
+    </div>
+    
+    <!-- 快速模式 -->
+    <div class="fee-option" onclick="selectFeeOption('fast')" id="fee-fast">
+        <input type="radio" name="feeOption" value="fast" onchange="selectFeeOption('fast')">
+        <div class="fee-label">
+            <div class="fee-name">快速</div>
+            <div class="fee-desc">较高费用，优先处理</div>
+        </div>
+        <div class="fee-price" id="feeFastPrice">计算中...</div>
+    </div>
+</div>
                     
                     <!-- 修复汇总信息样式 - 更清晰可见 -->
                     <div class="summary-card">
