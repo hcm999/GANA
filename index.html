@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GANA质押管理平台</title>
+    <title>GANA质押管理平台 - 批量操作版</title>
     <!-- 引入 Bootstrap 用于快速布局 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- 引入 Ethers.js V6 -->
@@ -18,6 +18,64 @@
         .btn-danger { background-color: #ef4444; border: none; }
         .btn-warning { background-color: #f59e0b; border: none; color: #fff; }
         .btn-warning:hover { background-color: #d97706; color: #fff; }
+        .btn-info { background-color: #3b82f6; border: none; color: #fff; }
+        
+        /* 复选框样式 */
+        .checkbox-column {
+            width: 40px;
+            text-align: center;
+        }
+        .record-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #3b82f6;
+        }
+        
+        /* 批量操作栏 */
+        .batch-actions {
+            background-color: #2d3748;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .selected-count {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-right: 15px;
+        }
+        
+        /* 批量质押模态框 */
+        .modal-content {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+        }
+        .modal-header {
+            border-bottom: 1px solid #334155;
+        }
+        .modal-footer {
+            border-top: 1px solid #334155;
+        }
+        .modal .form-control, .modal .form-select {
+            background-color: #334155;
+            border-color: #475569;
+            color: white;
+        }
+        .modal .form-control:focus, .modal .form-select:focus {
+            background-color: #334155;
+            color: white;
+            border-color: #38bdf8;
+            box-shadow: none;
+        }
+        .close {
+            color: #94a3b8;
+        }
+        
         .warning-box {
             background-color: #450a0a;
             border: 1px solid #ef4444;
@@ -53,30 +111,28 @@
             word-break: break-word;
         }
 
-        /* 列宽设置 - 优化版 */
-        .table th:nth-child(1), .table td:nth-child(1) { width: 7%; }  /* ID列 - 缩小 */
-        .table th:nth-child(2), .table td:nth-child(2) { width: 15%; }  /* 金额列 */
-        .table th:nth-child(3), .table td:nth-child(3) { width: 10%; } /* 周期列 */
-        .table th:nth-child(4), .table td:nth-child(4) { width: 20%; } /* 质押时间 */
-        .table th:nth-child(5), .table td:nth-child(5) { width: 20%; } /* 剩余时间 - 分两行 */
-        .table th:nth-child(6), .table td:nth-child(6) { width: 12%; } /* 状态列 */
-        .table th:nth-child(7), .table td:nth-child(7) { width: 16%; } /* 操作列 */
+        /* 列宽设置 */
+        .table th:nth-child(1), .table td:nth-child(1) { width: 5%; }  /* 复选框 */
+        .table th:nth-child(2), .table td:nth-child(2) { width: 5%; }  /* ID */
+        .table th:nth-child(3), .table td:nth-child(3) { width: 12%; } /* 金额 */
+        .table th:nth-child(4), .table td:nth-child(4) { width: 8%; }  /* 周期 */
+        .table th:nth-child(5), .table td:nth-child(5) { width: 18%; } /* 质押时间 */
+        .table th:nth-child(6), .table td:nth-child(6) { width: 18%; } /* 剩余时间 */
+        .table th:nth-child(7), .table td:nth-child(7) { width: 10%; } /* 状态 */
+        .table th:nth-child(8), .table td:nth-child(8) { width: 24%; } /* 操作 */
 
-        /* ID列样式 - 取消标签，黑色字体，减小 */
         .id-value {
             font-size: 0.7rem;
-            color: #94a3b8; /* 灰色 */
+            color: #94a3b8;
             font-weight: normal;
         }
 
-        /* 金额列样式 - 调大一点，红色 */
         .amount-value {
             font-size: 0.9rem;
-            color: #f87171; /* 红色 */
+            color: #f87171;
             font-weight: 500;
         }
 
-        /* 周期标签 */
         .badge-duration { 
             background-color: #374151; 
             color: #9ca3af; 
@@ -88,7 +144,6 @@
             font-weight: 500;
         }
         
-        /* 时间双行显示 */
         .time-two-lines {
             display: flex;
             flex-direction: column;
@@ -103,7 +158,6 @@
             color: #94a3b8;
         }
         
-        /* 剩余时间双行显示 */
         .remaining-two-lines {
             display: flex;
             flex-direction: column;
@@ -111,7 +165,7 @@
         }
         .remaining-top {
             font-size: 0.8rem;
-            color: #f87171; /* 红色 */
+            color: #f87171;
             font-weight: 500;
         }
         .remaining-bottom {
@@ -119,52 +173,23 @@
             color: #94a3b8;
         }
         
-        /* 已解锁状态的特殊样式 */
         .remaining-top.unlocked {
-            color: #34d399; /* 绿色 */
-        }
-        
-        /* 倒计时样式 - 移除原有样式，使用新的双行样式 */
-        .countdown { 
-            display: inline-block;
-            width: 100%;
+            color: #34d399;
         }
         
         input.form-control { background-color: #334155; border-color: #475569; color: white; }
         input.form-control:focus { background-color: #334155; color: white; border-color: #38bdf8; box-shadow: none; }
+        
         .staking-btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .staking-btn-group .btn { flex: 1; min-width: 120px; }
         
         .align-items-end label.form-label { color: wheat; }
         
-        /* 调整表格中特定列的字体大小 */
-        .stake-time-cell { 
-            white-space: normal; 
-        }
-        .remaining-time-cell { 
-            white-space: normal; 
-        }
-        .status-cell { 
-            font-size: 0.8rem; 
-            white-space: normal; 
-            word-break: break-word;
-            line-height: 1.3;
-        }
-        .action-cell { 
-            font-size: 0.8rem; 
-            white-space: normal; 
-            word-break: break-word;
-        }
+        .stake-time-cell { white-space: normal; }
+        .remaining-time-cell { white-space: normal; }
+        .status-cell { font-size: 0.8rem; white-space: normal; word-break: break-word; line-height: 1.3; }
+        .action-cell { font-size: 0.8rem; white-space: normal; word-break: break-word; }
         
-        /* 状态标签样式 */
-        .status-cell span {
-            display: inline-block;
-            max-width: 100%;
-            word-break: break-word;
-            line-height: 1.4;
-        }
-        
-        /* 操作按钮样式 */
         .action-cell .btn-sm { 
             padding: 0.15rem 0.3rem; 
             font-size: 0.7rem; 
@@ -174,120 +199,50 @@
             max-width: 100%;
             height: auto;
             min-height: 28px;
+            margin: 2px 0;
         }
         
-        /* 已提取状态的特殊样式 */
-        .action-cell .btn-sm.btn-secondary {
-            white-space: normal;
-            word-break: break-word;
-            height: auto;
-            padding: 0.15rem 0.2rem;
-        }
-        
-        /* 调整表格行高 */
-        .table tbody tr { height: auto; min-height: 60px; }
-        
-        /* 选项卡样式 */
-        .nav-tabs { border-bottom: 1px solid #334155; }
-        .nav-tabs .nav-link { 
-            color: #94a3b8; 
-            border: 1px solid transparent;
-            border-radius: 0.375rem 0.375rem 0 0;
-        }
-        .nav-tabs .nav-link:hover { 
-            color: #cbd5e1; 
-            border-color: #475569;
-        }
-        .nav-tabs .nav-link.active { 
-            color: #38bdf8; 
-            background-color: #1e293b; 
-            border-color: #475569 #475569 #1e293b;
-        }
-        .tab-content { padding-top: 1rem; }
-        
-        /* 我的质押记录子选项卡样式 */
-        .sub-tabs {
+        /* 批量操作行 */
+        .batch-row {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 10px;
-        }
-        .sub-tab {
-            background-color: transparent;
-            border: 1px solid #475569;
-            color: #94a3b8;
-            padding: 4px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-        .sub-tab:hover {
-            background-color: #334155;
-            color: #e2e8f0;
-        }
-        .sub-tab.active {
-            background-color: #3b82f6;
-            border-color: #3b82f6;
-            color: white;
-        }
-        
-        .address-short { 
-            font-family: 'Courier New', monospace; 
-            background-color: #1f2937; 
-            padding: 2px 6px; 
-            border-radius: 3px; 
-            font-size: 0.8rem;
-        }
-        .total-stats-card { border-left: 4px solid #3b82f6; }
-        .contract-address { 
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #60a5fa;
-            word-break: break-all;
-            background-color: #1f2937;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin: 5px 0;
-        }
-        
-        /* 缓存状态提示 */
-        .cache-status {
-            font-size: 0.7rem;
-            color: #6b7280;
-            margin-left: 10px;
-        }
-        
-        /* 记录项高亮 */
-        @keyframes highlight {
-            0% { background-color: #3b82f6; }
-            100% { background-color: transparent; }
-        }
-        .record-highlight {
-            animation: highlight 1s ease-out;
-        }
-        
-        /* 加载进度提示 */
-        .loading-progress {
-            margin-top: 10px;
+            align-items: center;
             padding: 10px;
-            background-color: #1e293b;
-            border-radius: 5px;
-            font-size: 0.85rem;
-            color: #38bdf8;
-            text-align: center;
+            background-color: #2d3748;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
-        /* 表格容器 */
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+        .progress-bar {
+            background-color: #334155;
+            height: 4px;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #38bdf8;
+            transition: width 0.3s ease;
+        }
+        
+        /* 加载动画 */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #38bdf8;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-
     <!-- 合约地址信息 -->
     <div class="alert alert-info mb-4">
         <h6 class="fw-bold">合约地址信息</h6>
@@ -309,7 +264,7 @@
 
     <!-- 钱包连接 -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold">GANA质押管理平台</h3>
+        <h3 class="fw-bold">GANA质押管理平台 - 批量操作版</h3>
         <button id="connectBtn" class="btn btn-primary" onclick="connectWallet()">连接钱包</button>
     </div>
 
@@ -341,56 +296,50 @@
         </div>
     </div>
 
-    <!-- 质押操作区域 -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title mb-3">参与质押</h5>
-            <div class="row g-3 align-items-end">
-                <div class="col-md-6">
-                    <label class="form-label">质押金额 (USDT)</label>
-                    <input type="number" class="form-control" id="stakeAmount" value="1000" placeholder="输入金额">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label d-block">选择质押周期</label>
-                    <div class="staking-btn-group">
-                        <button class="btn btn-success" onclick="handleStake(0, 1)">1天(0.4%)</button>
-                        <button class="btn btn-success" onclick="handleStake(1, 15)">15天(0.8%)</button>
-                        <button class="btn btn-success" onclick="handleStake(2, 30)">30天(1.5%)</button>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-2 small text-white">
-                * 注意：不同质押周期的日化率和解锁时间不同
-            </div>
-        </div>
+    <!-- 批量质押按钮 -->
+    <div class="mb-3">
+        <button class="btn btn-success" onclick="showBatchStakeModal()">
+            <i class="bi bi-plus-circle"></i> 批量质押
+        </button>
     </div>
 
-    <!-- 质押记录区域（选项卡） -->
+    <!-- 质押记录区域 -->
     <div class="card">
         <div class="card-body">
             <!-- 选项卡导航 -->
             <ul class="nav nav-tabs" id="stakeTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="my-stake-tab" data-bs-toggle="tab" data-bs-target="#my-stake" type="button" role="tab" aria-controls="my-stake" aria-selected="true">我的质押记录 <span id="myStakeCount" class="badge bg-secondary ms-1">0</span></button>
+                    <button class="nav-link active" id="my-stake-tab" data-bs-toggle="tab" data-bs-target="#my-stake" type="button" role="tab">我的质押记录 <span id="myStakeCount" class="badge bg-secondary ms-1">0</span></button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="all-stake-tab" data-bs-toggle="tab" data-bs-target="#all-stake" type="button" role="tab" aria-controls="all-stake" aria-selected="false">合约总质押记录</button>
+                    <button class="nav-link" id="all-stake-tab" data-bs-toggle="tab" data-bs-target="#all-stake" type="button" role="tab">合约总质押记录</button>
                 </li>
             </ul>
             
             <!-- 选项卡内容 -->
             <div class="tab-content" id="stakeTabContent">
                 <!-- 我的质押记录 -->
-                <div class="tab-pane fade show active" id="my-stake" role="tabpanel" aria-labelledby="my-stake-tab">
+                <div class="tab-pane fade show active" id="my-stake" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
-                        <h5 class="card-title mb-0">
-                            我的质押记录
-                            <span class="cache-status" id="cacheStatus"></span>
-                        </h5>
+                        <h5 class="card-title mb-0">我的质押记录</h5>
                         <div>
                             <button class="btn btn-sm btn-outline-light" onclick="refreshData()">刷新全部</button>
                             <button class="btn btn-sm btn-outline-info ms-2" onclick="toggleAutoRefresh()" id="autoRefreshBtn">自动刷新: 关闭</button>
                         </div>
+                    </div>
+                    
+                    <!-- 批量操作栏 -->
+                    <div class="batch-actions" id="batchActions" style="display: none;">
+                        <div class="selected-count" id="selectedCount">已选择 0 条记录</div>
+                        <button class="btn btn-warning btn-sm" onclick="batchUnstake()" id="batchUnstakeBtn">
+                            批量赎回选中项
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="selectAllRecords()">
+                            全选
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="deselectAllRecords()">
+                            取消全选
+                        </button>
                     </div>
                     
                     <!-- 我的质押记录子选项卡 -->
@@ -400,10 +349,24 @@
                         <span class="sub-tab" onclick="filterMyStakes('inactive')" id="filter-inactive">已赎回</span>
                     </div>
                     
+                    <!-- 批量操作进度条 -->
+                    <div id="batchProgress" style="display: none;" class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span id="progressText">准备中...</span>
+                            <span id="progressPercentage">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
+                                    <th class="checkbox-column">
+                                        <input type="checkbox" class="record-checkbox" id="selectAllCheckbox" onclick="toggleSelectAll()">
+                                    </th>
                                     <th>ID</th>
                                     <th>金额</th>
                                     <th>周期</th>
@@ -414,14 +377,14 @@
                                 </tr>
                             </thead>
                             <tbody id="stakeListBody">
-                                <tr><td colspan="7" class="text-center">请连接钱包查看数据</td></tr>
+                                <tr><td colspan="8" class="text-center">请连接钱包查看数据</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
                 
                 <!-- 合约总质押记录 -->
-                <div class="tab-pane fade" id="all-stake" role="tabpanel" aria-labelledby="all-stake-tab">
+                <div class="tab-pane fade" id="all-stake" role="tabpanel">
                     <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
                         <h5 class="card-title mb-0">合约总质押记录</h5>
                         <div>
@@ -493,9 +456,56 @@
             </div>
         </div>
     </div>
+
+    <!-- 批量质押模态框 -->
+    <div class="modal fade" id="batchStakeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">批量质押</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">选择质押周期</label>
+                        <select class="form-select" id="batchStakePeriod">
+                            <option value="0">1天 (0.4%)</option>
+                            <option value="1">15天 (0.8%)</option>
+                            <option value="2">30天 (1.5%)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">批量金额配置</label>
+                        <div id="stakeAmountsContainer">
+                            <div class="input-group mb-2">
+                                <input type="number" class="form-control stake-amount" placeholder="输入金额" value="1000">
+                                <button class="btn btn-outline-danger remove-amount" type="button" onclick="removeStakeAmount(this)">删除</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary mt-2" onclick="addStakeAmount()">
+                            + 添加质押金额
+                        </button>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">汇总信息</label>
+                        <div class="card p-3">
+                            <div>总质押笔数: <span id="totalStakeCount">0</span></div>
+                            <div>总质押金额: <span id="totalStakeAmount">0.00</span> USDT</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-success" onclick="executeBatchStake()">确认批量质押</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- 引入 Bootstrap JS 用于选项卡功能 -->
+<!-- 引入 Bootstrap JS 用于选项卡和模态框功能 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
@@ -504,7 +514,8 @@
         STAKING: "0x72212F35aC448FE7763aA1BFdb360193Fa098E52",
         USDT: "0x55d398326f99059fF775485246999027B3197955",
         PAIR: "0xa2f464a2462aed49b9b31eb8861bc6b0bbb0483f",
-        TOTAL_STAKE_PAGE_SIZE: 10
+        TOTAL_STAKE_PAGE_SIZE: 10,
+        BATCH_SIZE: 5 // 每批处理的交易数量
     };
     
     // 质押周期配置 (秒)
@@ -536,6 +547,7 @@
     let stakingContract, usdtContract;
     let autoRefreshInterval = null;
     let countdownTimers = {};
+    let batchStakeModal;
     
     // 总质押记录相关变量
     let allStakeData = [];
@@ -568,7 +580,7 @@
         }
     }
 
-    // 显示剩余时间 - 分两行：天和小时在上面，分和秒在下面
+    // 显示剩余时间
     function formatTimeRemainingSplit(seconds) {
         if (seconds <= 0) return { top: "0秒", bottom: "" };
         
@@ -647,20 +659,541 @@
         }
     }
 
-    // 更新缓存状态
-    function updateCacheStatus() {
-        const cacheStatusEl = document.getElementById('cacheStatus');
-        if (!cacheStatusEl) return;
-        const now = Date.now();
-        if (lastFetchTime === 0) {
-            cacheStatusEl.textContent = '未加载';
-        } else if (pendingUpdates.size > 0) {
-            cacheStatusEl.textContent = `🔄 更新中 (${pendingUpdates.size}条)`;
+    // ================= 批量操作功能 =================
+    
+    // 显示批量质押模态框
+    function showBatchStakeModal() {
+        if (!userAddress) {
+            alert("请先连接钱包");
+            return;
+        }
+        
+        // 初始化 Bootstrap 模态框
+        if (!batchStakeModal) {
+            batchStakeModal = new bootstrap.Modal(document.getElementById('batchStakeModal'));
+        }
+        
+        // 重置表单
+        document.getElementById('stakeAmountsContainer').innerHTML = `
+            <div class="input-group mb-2">
+                <input type="number" class="form-control stake-amount" placeholder="输入金额" value="1000">
+                <button class="btn btn-outline-danger remove-amount" type="button" onclick="removeStakeAmount(this)">删除</button>
+            </div>
+        `;
+        
+        updateBatchStakeSummary();
+        batchStakeModal.show();
+    }
+    
+    // 添加质押金额输入框
+    function addStakeAmount() {
+        const container = document.getElementById('stakeAmountsContainer');
+        const newInput = document.createElement('div');
+        newInput.className = 'input-group mb-2';
+        newInput.innerHTML = `
+            <input type="number" class="form-control stake-amount" placeholder="输入金额" value="1000">
+            <button class="btn btn-outline-danger remove-amount" type="button" onclick="removeStakeAmount(this)">删除</button>
+        `;
+        container.appendChild(newInput);
+        updateBatchStakeSummary();
+    }
+    
+    // 删除质押金额输入框
+    function removeStakeAmount(btn) {
+        const container = document.getElementById('stakeAmountsContainer');
+        if (container.children.length > 1) {
+            btn.closest('.input-group').remove();
+            updateBatchStakeSummary();
         } else {
-            cacheStatusEl.textContent = `⏱️ ${Math.round((now - lastFetchTime)/1000)}秒前更新`;
+            alert("至少需要保留一个质押金额");
         }
     }
+    
+    // 更新批量质押汇总
+    function updateBatchStakeSummary() {
+        const amounts = document.querySelectorAll('.stake-amount');
+        let total = 0;
+        let count = 0;
+        
+        amounts.forEach(input => {
+            const val = parseFloat(input.value) || 0;
+            if (val > 0) {
+                total += val;
+                count++;
+            }
+        });
+        
+        document.getElementById('totalStakeCount').textContent = count;
+        document.getElementById('totalStakeAmount').textContent = total.toFixed(2);
+    }
+    
+    // 监听金额输入变化
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('stake-amount')) {
+            updateBatchStakeSummary();
+        }
+    });
+    
+    // 执行批量质押
+    async function executeBatchStake() {
+        if (!userAddress) return alert("请先连接钱包");
+        
+        const stakeIndex = parseInt(document.getElementById('batchStakePeriod').value);
+        const amountInputs = document.querySelectorAll('.stake-amount');
+        const amounts = [];
+        
+        // 收集有效金额
+        for (const input of amountInputs) {
+            const val = parseFloat(input.value);
+            if (val > 0) {
+                amounts.push(val);
+            }
+        }
+        
+        if (amounts.length === 0) {
+            return alert("请至少输入一个有效金额");
+        }
+        
+        // 计算总金额用于授权
+        const totalAmount = amounts.reduce((sum, val) => sum + val, 0);
+        const totalAmountWei = ethers.parseUnits(totalAmount.toString(), 18);
+        
+        // 关闭模态框
+        batchStakeModal.hide();
+        
+        // 显示进度条
+        showBatchProgress(amounts.length);
+        
+        try {
+            // 检查并授权
+            updateProgressText("检查授权...", 0);
+            const allowance = await usdtContract.allowance(userAddress, CONFIG.STAKING);
+            
+            if (allowance < totalAmountWei) {
+                updateProgressText("正在授权 USDT...", 10);
+                const txApprove = await usdtContract.approve(CONFIG.STAKING, totalAmountWei);
+                await txApprove.wait();
+            }
+            
+            // 分批执行质押
+            const batchSize = CONFIG.BATCH_SIZE;
+            let successCount = 0;
+            let failedAmounts = [];
+            
+            for (let i = 0; i < amounts.length; i += batchSize) {
+                const batch = amounts.slice(i, i + batchSize);
+                const batchPromises = [];
+                
+                updateProgressText(
+                    `正在执行第 ${i+1}-${Math.min(i+batchSize, amounts.length)} 笔质押...`,
+                    Math.round((i / amounts.length) * 70) + 10
+                );
+                
+                // 并行执行当前批次
+                for (const amount of batch) {
+                    const amountWei = ethers.parseUnits(amount.toString(), 18);
+                    const promise = stakingContract.stake(amountWei, 0, stakeIndex)
+                        .then(async tx => {
+                            await tx.wait();
+                            successCount++;
+                            return { success: true, amount };
+                        })
+                        .catch(error => {
+                            console.error(`质押 ${amount} USDT 失败:`, error);
+                            failedAmounts.push(amount);
+                            return { success: false, amount };
+                        });
+                    
+                    batchPromises.push(promise);
+                    
+                    // 稍微延迟避免nonce冲突
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                await Promise.all(batchPromises);
+                
+                // 更新进度
+                updateProgressText(
+                    `已完成 ${successCount}/${amounts.length} 笔`,
+                    Math.round(((i + batch.length) / amounts.length) * 80) + 10
+                );
+            }
+            
+            // 最终进度
+            updateProgressText("更新数据中...", 90);
+            
+            // 刷新数据
+            await refreshData();
+            
+            updateProgressText("批量质押完成！", 100);
+            
+            // 显示结果
+            let resultMsg = `批量质押完成！成功: ${successCount} 笔`;
+            if (failedAmounts.length > 0) {
+                resultMsg += `\n失败: ${failedAmounts.length} 笔 (金额: ${failedAmounts.join(', ')})`;
+            }
+            alert(resultMsg);
+            
+        } catch (error) {
+            console.error("批量质押失败:", error);
+            alert("批量质押失败: " + (error.message || error));
+        } finally {
+            // 隐藏进度条
+            setTimeout(() => {
+                hideBatchProgress();
+            }, 3000);
+        }
+    }
+    
+    // 批量赎回
+    async function batchUnstake() {
+        const checkboxes = document.querySelectorAll('.record-checkbox:checked');
+        const selectedIndices = Array.from(checkboxes)
+            .map(cb => parseInt(cb.value))
+            .filter(index => !isNaN(index));
+        
+        if (selectedIndices.length === 0) {
+            return alert("请选择要赎回的质押记录");
+        }
+        
+        // 过滤出可赎回的记录（未赎回且已解锁）
+        const validIndices = selectedIndices.filter(index => {
+            const record = myStakeRecords.find(r => r.index === index);
+            return record && !record.isActive && record.timeRemaining <= 0;
+        });
+        
+        if (validIndices.length === 0) {
+            return alert("选中的记录中没有可赎回的项（请确保记录已解锁且未赎回）");
+        }
+        
+        if (!confirm(`确定要批量赎回 ${validIndices.length} 笔质押记录吗？`)) {
+            return;
+        }
+        
+        // 显示进度条
+        showBatchProgress(validIndices.length);
+        
+        try {
+            const batchSize = CONFIG.BATCH_SIZE;
+            let successCount = 0;
+            let failedIndices = [];
+            
+            for (let i = 0; i < validIndices.length; i += batchSize) {
+                const batch = validIndices.slice(i, i + batchSize);
+                const batchPromises = [];
+                
+                updateProgressText(
+                    `正在赎回第 ${i+1}-${Math.min(i+batchSize, validIndices.length)} 笔...`,
+                    Math.round((i / validIndices.length) * 80)
+                );
+                
+                // 并行执行当前批次
+                for (const index of batch) {
+                    const promise = stakingContract.unstake(index)
+                        .then(async tx => {
+                            await tx.wait();
+                            pendingUpdates.add(index.toString());
+                            successCount++;
+                            return { success: true, index };
+                        })
+                        .catch(error => {
+                            console.error(`赎回记录 ${index} 失败:`, error);
+                            failedIndices.push(index);
+                            return { success: false, index };
+                        });
+                    
+                    batchPromises.push(promise);
+                    
+                    // 稍微延迟避免nonce冲突
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                await Promise.all(batchPromises);
+                
+                // 更新进度
+                updateProgressText(
+                    `已完成 ${successCount}/${validIndices.length} 笔`,
+                    Math.round(((i + batch.length) / validIndices.length) * 80)
+                );
+            }
+            
+            // 刷新数据
+            updateProgressText("更新数据中...", 90);
+            await refreshChangedRecords();
+            await refreshStatsOnly();
+            
+            updateProgressText("批量赎回完成！", 100);
+            
+            // 取消所有选中
+            deselectAllRecords();
+            
+            // 显示结果
+            let resultMsg = `批量赎回完成！成功: ${successCount} 笔`;
+            if (failedIndices.length > 0) {
+                resultMsg += `\n失败: ${failedIndices.length} 笔 (记录ID: ${failedIndices.join(', ')})`;
+            }
+            alert(resultMsg);
+            
+        } catch (error) {
+            console.error("批量赎回失败:", error);
+            alert("批量赎回失败: " + (error.message || error));
+        } finally {
+            setTimeout(() => {
+                hideBatchProgress();
+            }, 3000);
+        }
+    }
+    
+    // 进度条显示函数
+    function showBatchProgress(total) {
+        const progressEl = document.getElementById('batchProgress');
+        progressEl.style.display = 'block';
+        updateProgressText(`准备处理 ${total} 笔交易...`, 0);
+    }
+    
+    function updateProgressText(text, percentage) {
+        document.getElementById('progressText').textContent = text;
+        document.getElementById('progressPercentage').textContent = percentage + '%';
+        document.getElementById('progressFill').style.width = percentage + '%';
+    }
+    
+    function hideBatchProgress() {
+        document.getElementById('batchProgress').style.display = 'none';
+    }
+    
+    // 复选框相关函数
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAllCheckbox').checked;
+        const checkboxes = document.querySelectorAll('.record-checkbox:not([disabled])');
+        checkboxes.forEach(cb => {
+            cb.checked = selectAll;
+        });
+        updateBatchActionsVisibility();
+    }
+    
+    function selectAllRecords() {
+        const checkboxes = document.querySelectorAll('.record-checkbox:not([disabled])');
+        checkboxes.forEach(cb => {
+            cb.checked = true;
+        });
+        document.getElementById('selectAllCheckbox').checked = true;
+        updateBatchActionsVisibility();
+    }
+    
+    function deselectAllRecords() {
+        const checkboxes = document.querySelectorAll('.record-checkbox');
+        checkboxes.forEach(cb => {
+            cb.checked = false;
+        });
+        document.getElementById('selectAllCheckbox').checked = false;
+        updateBatchActionsVisibility();
+    }
+    
+    function updateBatchActionsVisibility() {
+        const checkboxes = document.querySelectorAll('.record-checkbox:checked');
+        const count = checkboxes.length;
+        const batchActions = document.getElementById('batchActions');
+        const batchUnstakeBtn = document.getElementById('batchUnstakeBtn');
+        
+        if (count > 0) {
+            batchActions.style.display = 'flex';
+            document.getElementById('selectedCount').textContent = `已选择 ${count} 条记录`;
+            
+            // 检查选中的是否都可赎回
+            const allUnlocked = Array.from(checkboxes).every(cb => {
+                const index = parseInt(cb.value);
+                const record = myStakeRecords.find(r => r.index === index);
+                return record && !record.isActive && record.timeRemaining <= 0;
+            });
+            
+            batchUnstakeBtn.disabled = !allUnlocked;
+            if (!allUnlocked) {
+                batchUnstakeBtn.title = "只能赎回已解锁且未提取的记录";
+            }
+        } else {
+            batchActions.style.display = 'none';
+        }
+    }
+    
+    // ================= 原有功能修改 =================
+    
+    // 修改渲染函数，添加复选框
+    function renderStakeListFromCache() {
+        const tbody = document.getElementById('stakeListBody');
+        if (!tbody) return;
+        
+        let filteredRecords = myStakeRecords;
+        if (currentFilter === 'active') {
+            filteredRecords = myStakeRecords.filter(r => !r.isActive);
+        } else if (currentFilter === 'inactive') {
+            filteredRecords = myStakeRecords.filter(r => r.isActive);
+        }
+        
+        if (filteredRecords.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">暂无质押记录</td></tr>';
+            document.getElementById('myStakeCount').textContent = myStakeRecords.length;
+            return;
+        }
+        
+        const now = Math.floor(Date.now() / 1000);
+        let html = '';
+        
+        filteredRecords.forEach(record => {
+            const isLocked = record.timeRemaining > 0 && !record.isActive;
+            const isUnlocked = record.timeRemaining <= 0 && !record.isActive;
+            const durationLabel = STAKE_DURATION_LABELS[record.stakeIndex] || "未知";
+            const timeObj = formatStakeTimeSplit(record.stakeTime);
+            const timeRemainingObj = formatTimeRemainingSplit(record.timeRemaining);
+            
+            let statusHtml = '';
+            let actionHtml = '';
+            let timeRemainingHtml = '';
+            let checkboxDisabled = true;
 
+            if (record.isActive) {
+                statusHtml = '<span class="text-muted">已提取</span>';
+                actionHtml = '-';
+                timeRemainingHtml = '<span class="text-muted">-</span>';
+            } else {
+                if (isLocked) {
+                    statusHtml = '<span class="text-danger">锁仓中</span>';
+                    actionHtml = `<button class="btn btn-sm btn-secondary" disabled>等待解锁</button>`;
+                    timeRemainingHtml = `
+                        <div class="remaining-two-lines">
+                            <span class="remaining-top">${timeRemainingObj.top}</span>
+                            <span class="remaining-bottom">${timeRemainingObj.bottom}</span>
+                        </div>
+                    `;
+                    checkboxDisabled = true;
+                } else if (isUnlocked) {
+                    statusHtml = '<span class="text-success">可赎回</span>';
+                    actionHtml = `<button class="btn btn-sm btn-warning" onclick="handleUnstake(${record.index})">赎回</button>`;
+                    timeRemainingHtml = '<span class="remaining-top unlocked">已解锁</span>';
+                    checkboxDisabled = false;
+                } else {
+                    statusHtml = '<span class="text-warning">未知</span>';
+                    actionHtml = '-';
+                    timeRemainingHtml = '-';
+                    checkboxDisabled = true;
+                }
+            }
+
+            html += `
+                <tr id="record-row-${record.index}" ${pendingUpdates.has(record.index.toString()) ? 'class="record-highlight"' : ''}>
+                    <td class="checkbox-column">
+                        <input type="checkbox" class="record-checkbox" value="${record.index}" 
+                               ${checkboxDisabled ? 'disabled' : ''} 
+                               onchange="updateBatchActionsVisibility()">
+                    </td>
+                    <td><span class="id-value">${record.index}</span></td>
+                    <td><span class="amount-value">${record.amount}</span></td>
+                    <td><span class="badge-duration">${durationLabel}</span></td>
+                    <td class="stake-time-cell">
+                        <div class="time-two-lines">
+                            <span class="time-date">${timeObj.date}</span>
+                            <span class="time-clock">${timeObj.time}</span>
+                        </div>
+                    </td>
+                    <td class="remaining-time-cell">${timeRemainingHtml}</td>
+                    <td class="status-cell">${statusHtml}</td>
+                    <td class="action-cell">${actionHtml}</td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = html;
+        document.getElementById('myStakeCount').textContent = myStakeRecords.length;
+        
+        // 重置全选复选框
+        document.getElementById('selectAllCheckbox').checked = false;
+        
+        setTimeout(() => {
+            document.querySelectorAll('.record-highlight').forEach(el => el.classList.remove('record-highlight'));
+        }, 1000);
+    }
+    
+    // 修改单笔赎回，支持进度更新
+    async function handleUnstake(index) {
+        if (!userAddress) return;
+        const btn = document.getElementById(`unstake-btn-${index}`);
+        if(btn) {
+            btn.disabled = true;
+            btn.innerText = "处理中...";
+        }
+        try {
+            showBatchProgress(1);
+            updateProgressText("正在赎回...", 30);
+            
+            const tx = await stakingContract.unstake(index);
+            updateProgressText("等待确认...", 60);
+            
+            await tx.wait();
+            pendingUpdates.add(index.toString());
+            
+            updateProgressText("更新数据...", 90);
+            await refreshChangedRecords();
+            await refreshStatsOnly();
+            
+            updateProgressText("赎回成功！", 100);
+            alert("赎回成功！");
+            
+        } catch (error) {
+            console.error(error);
+            alert("赎回失败: " + (error.message || error));
+            if(btn) {
+                btn.disabled = false;
+                btn.innerText = "赎回";
+            }
+        } finally {
+            setTimeout(() => {
+                hideBatchProgress();
+            }, 2000);
+        }
+    }
+    
+    // 刷新数据
+    async function refreshData() {
+        if (!userAddress) return;
+        const btn = document.querySelector('button[onclick="refreshData()"]');
+        const originalText = btn.innerText;
+        btn.innerText = "加载中...";
+        
+        try {
+            await refreshStatsOnly();
+            const newCount = await stakingContract.stakeCount(userAddress);
+            if (myStakeRecords.length !== Number(newCount)) {
+                for (let i = 0; i < Number(newCount); i++) {
+                    pendingUpdates.add(i.toString());
+                }
+            }
+            await refreshChangedRecords();
+            lastFetchTime = Date.now();
+        } catch (error) {
+            console.error("数据加载错误:", error);
+        } finally {
+            btn.innerText = originalText;
+        }
+    }
+    
+    // 刷新统计
+    async function refreshStatsOnly() {
+        if (!userAddress) return;
+        try {
+            const [myBal, stakedBal, poolBal, totalStaked] = await Promise.all([
+                usdtContract.balanceOf(userAddress),
+                stakingContract.balanceOf(userAddress),
+                usdtContract.balanceOf(CONFIG.PAIR),
+                stakingContract.totalSupply()
+            ]);
+            document.getElementById('myBalance').innerText = formatAmountTwoDecimals(myBal);
+            document.getElementById('stakedBalance').innerText = formatAmountTwoDecimals(stakedBal);
+            document.getElementById('poolBalance').innerText = formatAmountTwoDecimals(poolBal);
+            document.getElementById('totalStaked').innerText = formatAmountTwoDecimals(totalStaked);
+        } catch (error) {
+            console.error("统计刷新失败:", error);
+        }
+    }
+    
     async function updateSingleRecord(index) {
         if (!userAddress || !stakingContract) return null;
         try {
@@ -688,18 +1221,16 @@
             return null;
         }
     }
-
+    
     async function refreshChangedRecords() {
         if (!userAddress || !stakingContract) return;
         const changedIndices = Array.from(pendingUpdates);
         if (changedIndices.length === 0) return;
-        updateCacheStatus();
         await Promise.all(changedIndices.map(index => updateSingleRecord(parseInt(index))));
         pendingUpdates.clear();
         renderStakeListFromCache();
-        updateCacheStatus();
     }
-
+    
     function filterMyStakes(filter) {
         currentFilter = filter;
         document.getElementById('filter-all').classList.remove('active');
@@ -707,447 +1238,6 @@
         document.getElementById('filter-inactive').classList.remove('active');
         document.getElementById(`filter-${filter}`).classList.add('active');
         renderStakeListFromCache();
-    }
-
-    function renderStakeListFromCache() {
-        const tbody = document.getElementById('stakeListBody');
-        if (!tbody) return;
-        
-        let filteredRecords = myStakeRecords;
-        if (currentFilter === 'active') {
-            filteredRecords = myStakeRecords.filter(r => !r.isActive);
-        } else if (currentFilter === 'inactive') {
-            filteredRecords = myStakeRecords.filter(r => r.isActive);
-        }
-        
-        if (filteredRecords.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center">暂无质押记录</td></tr>';
-            document.getElementById('myStakeCount').textContent = myStakeRecords.length;
-            return;
-        }
-        
-        const now = Math.floor(Date.now() / 1000);
-        let html = '';
-        
-        filteredRecords.forEach(record => {
-            const isLocked = record.timeRemaining > 0 && !record.isActive;
-            const isUnlocked = record.timeRemaining <= 0 && !record.isActive;
-            const durationLabel = STAKE_DURATION_LABELS[record.stakeIndex] || "未知";
-            const timeObj = formatStakeTimeSplit(record.stakeTime);
-            const timeRemainingObj = formatTimeRemainingSplit(record.timeRemaining);
-            
-            let statusHtml = '';
-            let actionHtml = '';
-            let timeRemainingHtml = '';
-
-            if (record.isActive) {
-                statusHtml = '<span class="text-muted">已提取</span>';
-                actionHtml = '-';
-                timeRemainingHtml = '<span class="text-muted">-</span>';
-            } else {
-                if (isLocked) {
-                    statusHtml = '<span class="text-danger">锁仓中</span>';
-                    actionHtml = `<button class="btn btn-sm btn-secondary" disabled>等待解锁</button>`;
-                    timeRemainingHtml = `
-                        <div class="remaining-two-lines">
-                            <span class="remaining-top">${timeRemainingObj.top}</span>
-                            <span class="remaining-bottom">${timeRemainingObj.bottom}</span>
-                        </div>
-                    `;
-                    startCountdown(record.index, record.timeRemaining);
-                } else if (isUnlocked) {
-                    statusHtml = '<span class="text-success">可赎回</span>';
-                    actionHtml = `<button class="btn btn-sm btn-warning" id="unstake-btn-${record.index}" onclick="handleUnstake(${record.index})">立即赎回</button>`;
-                    timeRemainingHtml = '<span class="remaining-top unlocked">已解锁</span>';
-                } else {
-                    statusHtml = '<span class="text-warning">未知</span>';
-                    actionHtml = '-';
-                    timeRemainingHtml = '-';
-                }
-            }
-
-            html += `
-                <tr id="record-row-${record.index}" ${pendingUpdates.has(record.index.toString()) ? 'class="record-highlight"' : ''}>
-                    <td><span class="id-value">${record.index}</span></td>
-                    <td><span class="amount-value">${record.amount}</span></td>
-                    <td><span class="badge-duration">${durationLabel}</span></td>
-                    <td class="stake-time-cell">
-                        <div class="time-two-lines">
-                            <span class="time-date">${timeObj.date}</span>
-                            <span class="time-clock">${timeObj.time}</span>
-                        </div>
-                    </td>
-                    <td class="remaining-time-cell">${timeRemainingHtml}</td>
-                    <td class="status-cell">${statusHtml}</td>
-                    <td class="action-cell">${actionHtml}</td>
-                </tr>
-            `;
-        });
-
-        tbody.innerHTML = html;
-        document.getElementById('myStakeCount').textContent = myStakeRecords.length;
-        
-        setTimeout(() => {
-            document.querySelectorAll('.record-highlight').forEach(el => el.classList.remove('record-highlight'));
-        }, 1000);
-    }
-
-    // 质押操作
-    async function handleStake(stakeIndex, durationDays) {
-        if (!userAddress) return alert("请先连接钱包");
-        const amountStr = document.getElementById('stakeAmount').value;
-        if (!amountStr || parseFloat(amountStr) <= 0) return alert("请输入有效金额");
-        const amountWei = ethers.parseUnits(amountStr, 18);
-        
-        const buttons = document.querySelectorAll('.staking-btn-group .btn');
-        const originalTexts = [];
-        
-        try {
-            buttons.forEach(btn => {
-                originalTexts.push(btn.textContent);
-                btn.disabled = true;
-            });
-            
-            const currentBtn = event.target;
-            currentBtn.textContent = "检查限额...";
-
-            const allowance = await usdtContract.allowance(userAddress, CONFIG.STAKING);
-            if (allowance < amountWei) {
-                currentBtn.textContent = "正在授权 USDT...";
-                const txApprove = await usdtContract.approve(CONFIG.STAKING, ethers.MaxUint256); 
-                await txApprove.wait();
-            }
-
-            currentBtn.textContent = "正在质押...";
-            const txStake = await stakingContract.stake(amountWei, 0, stakeIndex);
-            await txStake.wait();
-            
-            const newCount = await stakingContract.stakeCount(userAddress);
-            const newIndex = Number(newCount) - 1;
-            pendingUpdates.add(newIndex.toString());
-            
-            await refreshStatsOnly();
-            await refreshChangedRecords();
-            
-            alert(`质押成功！周期：${durationDays}天`);
-        } catch (error) {
-            console.error(error);
-            alert("质押失败: " + (error.message || error));
-        } finally {
-            buttons.forEach((btn, index) => {
-                btn.disabled = false;
-                btn.textContent = originalTexts[index];
-            });
-        }
-    }
-
-    async function refreshStatsOnly() {
-        if (!userAddress) return;
-        try {
-            const [myBal, stakedBal, poolBal, totalStaked] = await Promise.all([
-                usdtContract.balanceOf(userAddress),
-                stakingContract.balanceOf(userAddress),
-                usdtContract.balanceOf(CONFIG.PAIR),
-                stakingContract.totalSupply()
-            ]);
-            document.getElementById('myBalance').innerText = formatAmountTwoDecimals(myBal);
-            document.getElementById('stakedBalance').innerText = formatAmountTwoDecimals(stakedBal);
-            document.getElementById('poolBalance').innerText = formatAmountTwoDecimals(poolBal);
-            document.getElementById('totalStaked').innerText = formatAmountTwoDecimals(totalStaked);
-        } catch (error) {
-            console.error("统计刷新失败:", error);
-        }
-    }
-
-    async function handleUnstake(index) {
-        if (!userAddress) return;
-        const btn = document.getElementById(`unstake-btn-${index}`);
-        if(btn) {
-            btn.disabled = true;
-            btn.innerText = "处理中...";
-        }
-        try {
-            const tx = await stakingContract.unstake(index);
-            await tx.wait();
-            pendingUpdates.add(index.toString());
-            await refreshStatsOnly();
-            await refreshChangedRecords();
-            alert("赎回成功！");
-        } catch (error) {
-            console.error(error);
-            alert("赎回失败: " + (error.message || error));
-            if(btn) {
-                btn.disabled = false;
-                btn.innerText = "赎回";
-            }
-        }
-    }
-
-    async function refreshData() {
-        if (!userAddress) return;
-        const btn = document.querySelector('button[onclick="refreshData()"]');
-        const originalText = btn.innerText;
-        btn.innerText = "加载中...";
-        
-        try {
-            await refreshStatsOnly();
-            const newCount = await stakingContract.stakeCount(userAddress);
-            if (myStakeRecords.length !== Number(newCount)) {
-                for (let i = 0; i < Number(newCount); i++) {
-                    pendingUpdates.add(i.toString());
-                }
-            }
-            await refreshChangedRecords();
-            lastFetchTime = Date.now();
-            updateCacheStatus();
-        } catch (error) {
-            console.error("数据加载错误:", error);
-        } finally {
-            btn.innerText = originalText;
-        }
-    }
-
-    function startCountdown(id, initialSeconds) {
-        let remaining = initialSeconds;
-        const countdownElement = document.getElementById(`countdown-${id}`);
-        if (!countdownElement) return;
-        
-        // 找到对应的父元素
-        const cellElement = countdownElement.closest('.remaining-time-cell');
-        
-        const timer = setInterval(() => {
-            remaining--;
-            if (remaining <= 0) {
-                clearInterval(timer);
-                pendingUpdates.add(id.toString());
-                refreshChangedRecords();
-                return;
-            }
-            
-            // 更新显示
-            if (cellElement) {
-                const timeRemainingObj = formatTimeRemainingSplit(remaining);
-                const topSpan = cellElement.querySelector('.remaining-top');
-                const bottomSpan = cellElement.querySelector('.remaining-bottom');
-                if (topSpan && bottomSpan) {
-                    topSpan.textContent = timeRemainingObj.top;
-                    bottomSpan.textContent = timeRemainingObj.bottom;
-                }
-            }
-        }, 1000);
-        countdownTimers[id] = timer;
-    }
-
-    // 全网质押记录刷新函数
-    async function refreshAllStakeData() {
-        if (!stakingContract) {
-            alert("请先连接钱包");
-            return;
-        }
-        
-        if (isLoadingAllData) return;
-        
-        const btn = document.querySelector('button[onclick="refreshAllStakeData()"]');
-        const originalText = btn.innerText;
-        btn.disabled = true;
-        btn.innerText = "加载中...";
-        isLoadingAllData = true;
-        
-        const progressEl = document.getElementById('loadingProgress');
-        if (progressEl) progressEl.style.display = 'block';
-        
-        try {
-            allStakeData = [];
-            
-            const currentBlock = await provider.getBlockNumber();
-            console.log("当前区块高度:", currentBlock);
-            
-            const BATCH_SIZE = 2000;
-            let fromBlock = Math.max(0, currentBlock - 50000);
-            let toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
-            let totalEvents = 0;
-            let batchCount = 0;
-            
-            const totalBatches = Math.ceil((currentBlock - fromBlock + 1) / BATCH_SIZE);
-            
-            while (fromBlock <= currentBlock) {
-                batchCount++;
-                const progress = Math.round((batchCount / totalBatches) * 100);
-                
-                if (progressEl) {
-                    progressEl.innerHTML = `正在加载历史数据... ${progress}% (第 ${batchCount}/${totalBatches} 批)`;
-                }
-                
-                console.log(`查询区块 ${fromBlock} 到 ${toBlock} (批次 ${batchCount}/${totalBatches})`);
-                
-                try {
-                    const filter = stakingContract.filters.Staked();
-                    const events = await stakingContract.queryFilter(filter, fromBlock, toBlock);
-                    
-                    console.log(`找到 ${events.length} 条事件`);
-                    totalEvents += events.length;
-                    
-                    for (const event of events) {
-                        try {
-                            if (event.args) {
-                                const amount = event.args[0];
-                                const user = event.args[1];
-                                const stakeIndex = Number(event.args[2]);
-                                const stakeTime = Number(event.args[3]);
-                                
-                                let isActive = true;
-                                try {
-                                    const record = await stakingContract.userStakeRecord(user, stakeIndex);
-                                    isActive = record[2];
-                                } catch (e) {}
-                                
-                                allStakeData.push({
-                                    userAddress: user,
-                                    amount: amount,
-                                    stakeTime: stakeTime,
-                                    isActive: isActive,
-                                    stakeIndex: stakeIndex
-                                });
-                            }
-                        } catch (eventError) {}
-                    }
-                    
-                    fromBlock = toBlock + 1;
-                    toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
-                    
-                    await new Promise(resolve => setTimeout(resolve, 200));
-                    
-                } catch (batchError) {
-                    console.error(`批次查询失败:`, batchError);
-                    fromBlock = toBlock + 1;
-                    toBlock = Math.min(fromBlock + BATCH_SIZE - 1, currentBlock);
-                }
-            }
-            
-            console.log(`总共找到 ${totalEvents} 条事件`);
-            
-            allStakeData.sort((a, b) => b.stakeTime - a.stakeTime);
-            
-            calculateAllStats();
-            
-            currentPage = 1;
-            renderAllStakeList();
-            updatePagination();
-            
-            if (progressEl) {
-                progressEl.innerHTML = `加载完成！共 ${allStakeData.length} 条记录`;
-                setTimeout(() => {
-                    progressEl.style.display = 'none';
-                }, 3000);
-            }
-            
-            btn.innerText = "刷新成功";
-            
-        } catch (error) {
-            console.error("获取全网质押数据失败:", error);
-            btn.innerText = "刷新失败";
-            
-            if (progressEl) {
-                progressEl.innerHTML = '加载失败，请稍后重试';
-                progressEl.style.color = '#ef4444';
-            }
-        } finally {
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.innerText = originalText;
-                isLoadingAllData = false;
-            }, 2000);
-        }
-    }
-    
-    // 计算统计
-    function calculateAllStats() {
-        if (allStakeData.length === 0) {
-            document.getElementById('totalUsers').textContent = '0';
-            document.getElementById('activeStakes').textContent = '0';
-            document.getElementById('avgStakeAmount').textContent = '0.00';
-            document.getElementById('totalStakeCount').textContent = '0';
-            return;
-        }
-        
-        const uniqueUsers = new Set(allStakeData.map(r => r.userAddress));
-        document.getElementById('totalUsers').textContent = uniqueUsers.size;
-        
-        const activeStakes = allStakeData.filter(r => !r.isActive).length;
-        document.getElementById('activeStakes').textContent = activeStakes;
-        
-        document.getElementById('totalStakeCount').textContent = allStakeData.length;
-        
-        const totalAmount = allStakeData.reduce((sum, r) => {
-            return sum + parseFloat(ethers.formatUnits(r.amount, 18));
-        }, 0);
-        document.getElementById('avgStakeAmount').textContent = (totalAmount / allStakeData.length).toFixed(2);
-    }
-    
-    // 渲染总质押列表
-    function renderAllStakeList() {
-        const tbody = document.getElementById('allStakeListBody');
-        if (allStakeData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center">暂无质押记录</td></tr>';
-            return;
-        }
-        
-        const startIndex = (currentPage - 1) * CONFIG.TOTAL_STAKE_PAGE_SIZE;
-        const endIndex = Math.min(startIndex + CONFIG.TOTAL_STAKE_PAGE_SIZE, allStakeData.length);
-        const pageData = allStakeData.slice(startIndex, endIndex);
-        
-        let html = '';
-        pageData.forEach((record, index) => {
-            const globalIndex = startIndex + index + 1;
-            const amount = formatAmountInteger(record.amount);
-            const timeObj = formatStakeTimeSplit(record.stakeTime);
-            const durationLabel = STAKE_DURATION_LABELS[record.stakeIndex] || "未知";
-            const status = record.isActive ? "已提取" : "质押中";
-            const statusClass = record.isActive ? "text-muted" : "text-success";
-            const isCurrentUser = record.userAddress.toLowerCase() === (userAddress || '').toLowerCase();
-            
-            html += `
-                <tr>
-                    <td>${globalIndex}</td>
-                    <td><span class="address-short">${shortenAddress(record.userAddress)}</span>${isCurrentUser ? '<span class="badge bg-info ms-2">我</span>' : ''}</td>
-                    <td><span class="amount-value">${amount}</span></td>
-                    <td><span class="badge-duration">${durationLabel}</span></td>
-                    <td class="stake-time-cell">
-                        <div class="time-two-lines">
-                            <span class="time-date">${timeObj.date}</span>
-                            <span class="time-clock">${timeObj.time}</span>
-                        </div>
-                    </td>
-                    <td class="status-cell"><span class="${statusClass}">${status}</span></td>
-                </tr>
-            `;
-        });
-        
-        tbody.innerHTML = html;
-    }
-    
-    function updatePagination() {
-        totalPages = Math.ceil(allStakeData.length / CONFIG.TOTAL_STAKE_PAGE_SIZE);
-        document.getElementById('currentPage').textContent = currentPage;
-        document.getElementById('totalPages').textContent = totalPages || 1;
-        document.getElementById('prevPageBtn').disabled = currentPage <= 1;
-        document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
-    }
-    
-    function prevPage() {
-        if (currentPage > 1) {
-            currentPage--;
-            renderAllStakeList();
-            updatePagination();
-        }
-    }
-    
-    function nextPage() {
-        if (currentPage < totalPages) {
-            currentPage++;
-            renderAllStakeList();
-            updatePagination();
-        }
     }
     
     // 自动刷新
@@ -1168,7 +1258,7 @@
             }
         }, 30000);
     }
-
+    
     function toggleAutoRefresh() {
         const btn = document.getElementById('autoRefreshBtn');
         if (autoRefreshInterval) {
@@ -1184,13 +1274,13 @@
             btn.classList.add('btn-info');
         }
     }
-
+    
     // 清理定时器
     window.addEventListener('beforeunload', () => {
         if (autoRefreshInterval) clearInterval(autoRefreshInterval);
         Object.keys(countdownTimers).forEach(id => clearInterval(countdownTimers[id]));
     });
-
+    
     // 初始化
     window.addEventListener('load', () => {
         if (typeof window.ethereum !== 'undefined') {
