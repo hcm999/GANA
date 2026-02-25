@@ -839,26 +839,46 @@
         }
     }
 
-    async function handleUnstake(index) {
-        if (!userAddress) return;
-        const btn = document.getElementById(`unstake-btn-${index}`);
+async function handleUnstake(index) {
+    if (!userAddress) return;
+    
+    // 获取按钮元素
+    const btn = document.getElementById(`unstake-btn-${index}`);
+    const originalText = btn ? btn.innerText : "立即赎回";
+    const originalClass = btn ? btn.className : "";
+    
+    if(btn) {
+        btn.disabled = true;
+        btn.innerText = "处理中...";
+        // 改变按钮样式为灰色
+        btn.classList.remove('btn-warning');
+        btn.classList.add('btn-secondary');
+    }
+    
+    try {
+        const tx = await stakingContract.unstake(index);
+        
+        // 可以加个简单的进度提示
+        if(btn) btn.innerText = "等待确认...";
+        
+        await tx.wait();
+        
+        pendingUpdates.add(index.toString());
+        await refreshStatsOnly();
+        await refreshChangedRecords();
+        
+        alert("赎回成功！");
+        
+    } catch (error) {
+        console.error(error);
+        alert("赎回失败: " + (error.message || error));
+        
+        // 恢复按钮状态
         if(btn) {
-            btn.disabled = true;
-            btn.innerText = "处理中...";
-        }
-        try {
-            const tx = await stakingContract.unstake(index);
-            await tx.wait();
-            pendingUpdates.add(index.toString());
-            await refreshStatsOnly();
-            await refreshChangedRecords();
-            alert("赎回成功！");
-        } catch (error) {
-            console.error(error);
-            alert("赎回失败: " + (error.message || error));
-            if(btn) {
-                btn.disabled = false;
-                btn.innerText = "赎回";
+            btn.disabled = false;
+            btn.innerText = originalText;
+            btn.classList.remove('btn-secondary');
+            btn.classList.add('btn-warning');
             }
         }
     }
