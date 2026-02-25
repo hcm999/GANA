@@ -131,11 +131,11 @@
 
         /* 列宽设置 - 恢复原来的8列表格 */
         .table th:nth-child(1), .table td:nth-child(1) { width: 5%; }  /* 复选框 */
-        .table th:nth-child(2), .table td:nth-child(2) { width: 5%; }  /* ID */
+        .table th:nth-child(2), .table td:nth-child(2) { width: 7%; }  /* ID */
         .table th:nth-child(3), .table td:nth-child(3) { width: 15%; } /* 金额 */
         .table th:nth-child(4), .table td:nth-child(4) { width: 9%; }  /* 周期 */
-        .table th:nth-child(5), .table td:nth-child(5) { width: 20%; } /* 质押时间 */
-        .table th:nth-child(6), .table td:nth-child(6) { width: 20%; } /* 剩余时间 */
+        .table th:nth-child(5), .table td:nth-child(5) { width: 19%; } /* 质押时间 */
+        .table th:nth-child(6), .table td:nth-child(6) { width: 19%; } /* 剩余时间 */
         .table th:nth-child(7), .table td:nth-child(7) { width: 10%; } /* 状态 */
         .table th:nth-child(8), .table td:nth-child(8) { width: 16%; } /* 操作 */
 
@@ -310,6 +310,49 @@
             height: 100%;
             background-color: #38bdf8;
             transition: width 0.3s ease;
+        }
+
+        /* 交易费用选项 */
+        .fee-options {
+            background-color: #2d3748;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .fee-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .fee-option:hover {
+            background-color: #374151;
+        }
+        .fee-option.selected {
+            border-color: #3b82f6;
+            background-color: #1e3a5f;
+        }
+        .fee-option input[type="radio"] {
+            margin-right: 10px;
+            accent-color: #3b82f6;
+        }
+        .fee-label {
+            flex: 1;
+        }
+        .fee-name {
+            font-weight: bold;
+            color: #e2e8f0;
+        }
+        .fee-desc {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        .fee-price {
+            color: #38bdf8;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -547,7 +590,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">选择质押周期</label>
-                        <select class="form-select" id="batchStakePeriod">
+                        <select class="form-select" id="batchStakePeriod" onchange="updateBatchStakeSummary()">
                             <option value="0">1天 (0.4%)</option>
                             <option value="1">15天 (0.8%)</option>
                             <option value="2">30天 (1.5%)</option>
@@ -565,6 +608,35 @@
                         <button class="btn btn-sm btn-outline-primary mt-2" onclick="addStakeAmount()">
                             + 添加质押金额
                         </button>
+                    </div>
+
+                    <!-- 交易费用选项 - 新增 -->
+                    <div class="fee-options">
+                        <label class="form-label mb-2">交易费用设置</label>
+                        <div class="fee-option selected" onclick="selectFeeOption('standard')" id="fee-standard">
+                            <input type="radio" name="feeOption" value="standard" checked onchange="selectFeeOption('standard')">
+                            <div class="fee-label">
+                                <div class="fee-name">标准 (推荐)</div>
+                                <div class="fee-desc">默认费用，等待时间适中</div>
+                            </div>
+                            <div class="fee-price" id="feeStandardPrice">计算中...</div>
+                        </div>
+                        <div class="fee-option" onclick="selectFeeOption('slow')" id="fee-slow">
+                            <input type="radio" name="feeOption" value="slow" onchange="selectFeeOption('slow')">
+                            <div class="fee-label">
+                                <div class="fee-name">经济</div>
+                                <div class="fee-desc">较低费用，等待时间较长</div>
+                            </div>
+                            <div class="fee-price" id="feeSlowPrice">计算中...</div>
+                        </div>
+                        <div class="fee-option" onclick="selectFeeOption('fast')" id="fee-fast">
+                            <input type="radio" name="feeOption" value="fast" onchange="selectFeeOption('fast')">
+                            <div class="fee-label">
+                                <div class="fee-name">快速</div>
+                                <div class="fee-desc">较高费用，优先处理</div>
+                            </div>
+                            <div class="fee-price" id="feeFastPrice">计算中...</div>
+                        </div>
                     </div>
                     
                     <!-- 修复汇总信息样式 - 更清晰可见 -->
@@ -598,7 +670,8 @@
         USDT: "0x55d398326f99059fF775485246999027B3197955",
         PAIR: "0xa2f464a2462aed49b9b31eb8861bc6b0bbb0483f",
         TOTAL_STAKE_PAGE_SIZE: 10,
-        BATCH_SIZE: 5 // 每批处理的交易数量
+        BATCH_SIZE: 5, // 每批处理的交易数量
+        MAX_PENDING_TXS: 3 // 最大并发交易数
     };
     
     // 质押周期配置 (秒)
@@ -643,6 +716,14 @@
     let lastFetchTime = 0;
     let pendingUpdates = new Set();
     let currentFilter = 'all';
+
+    // 交易费用相关
+    let currentFeeOption = 'standard';
+    let gasPrices = {
+        standard: null,
+        slow: null,
+        fast: null
+    };
 
     // ================= 工具函数 =================
     function formatAmountInteger(wei) {
@@ -716,6 +797,60 @@
         return address.substring(0, 6) + '...' + address.substring(address.length - 4);
     }
 
+    // ================= 获取Gas价格 =================
+    async function updateGasPrices() {
+        if (!provider) return;
+        
+        try {
+            const feeData = await provider.getFeeData();
+            const baseGasPrice = feeData.gasPrice || ethers.parseUnits('5', 'gwei');
+            
+            // BSC推荐Gas价格配置
+            gasPrices = {
+                slow: baseGasPrice, // 经济：基础价格
+                standard: baseGasPrice * 12n / 10n, // 标准：1.2倍
+                fast: baseGasPrice * 15n / 10n // 快速：1.5倍
+            };
+            
+            // 更新显示
+            document.getElementById('feeSlowPrice').textContent = formatGwei(gasPrices.slow) + ' Gwei';
+            document.getElementById('feeStandardPrice').textContent = formatGwei(gasPrices.standard) + ' Gwei';
+            document.getElementById('feeFastPrice').textContent = formatGwei(gasPrices.fast) + ' Gwei';
+            
+        } catch (error) {
+            console.error("获取Gas价格失败:", error);
+        }
+    }
+    
+    function formatGwei(wei) {
+        return (Number(ethers.formatUnits(wei, 'gwei'))).toFixed(1);
+    }
+    
+    function selectFeeOption(option) {
+        currentFeeOption = option;
+        
+        // 更新UI
+        document.getElementById('fee-standard').classList.remove('selected');
+        document.getElementById('fee-slow').classList.remove('selected');
+        document.getElementById('fee-fast').classList.remove('selected');
+        document.getElementById(`fee-${option}`).classList.add('selected');
+        
+        document.querySelectorAll('input[name="feeOption"]').forEach(radio => {
+            radio.checked = (radio.value === option);
+        });
+    }
+
+    // ================= 获取交易覆盖 =================
+    async function getTransactionOverrides() {
+        const overrides = {};
+        
+        if (gasPrices[currentFeeOption]) {
+            overrides.gasPrice = gasPrices[currentFeeOption];
+        }
+        
+        return overrides;
+    }
+
     // ================= 缓存状态更新 =================
     function updateCacheStatus() {
         const cacheStatusEl = document.getElementById('cacheStatus');
@@ -748,6 +883,7 @@
             usdtContract = new ethers.Contract(CONFIG.USDT, ABI_ERC20, signer);
 
             await refreshData();
+            await updateGasPrices(); // 更新Gas价格
         } catch (error) {
             console.error("连接失败:", error);
             alert("连接钱包失败: " + (error.message || error));
@@ -776,12 +912,14 @@
             const allowance = await usdtContract.allowance(userAddress, CONFIG.STAKING);
             if (allowance < amountWei) {
                 currentBtn.textContent = "正在授权 USDT...";
-                const txApprove = await usdtContract.approve(CONFIG.STAKING, ethers.MaxUint256); 
+                const overrides = await getTransactionOverrides();
+                const txApprove = await usdtContract.approve(CONFIG.STAKING, ethers.MaxUint256, overrides); 
                 await txApprove.wait();
             }
 
             currentBtn.textContent = "正在质押...";
-            const txStake = await stakingContract.stake(amountWei, 0, stakeIndex);
+            const overrides = await getTransactionOverrides();
+            const txStake = await stakingContract.stake(amountWei, 0, stakeIndex, overrides);
             await txStake.wait();
             
             const newCount = await stakingContract.stakeCount(userAddress);
@@ -980,7 +1118,8 @@
             showBatchProgress(1);
             updateProgressText("正在赎回...", 30);
             
-            const tx = await stakingContract.unstake(index);
+            const overrides = await getTransactionOverrides();
+            const tx = await stakingContract.unstake(index, overrides);
             
             updateProgressText("等待确认...", 60);
             await tx.wait();
@@ -1051,6 +1190,7 @@
             </div>
         `;
         
+        updateGasPrices(); // 更新Gas价格
         updateBatchStakeSummary();
         batchStakeModal.show();
     }
@@ -1129,50 +1269,65 @@
             updateProgressText("检查授权...", 0);
             const allowance = await usdtContract.allowance(userAddress, CONFIG.STAKING);
             
+            // 一次性授权，避免多次授权
             if (allowance < totalAmountWei) {
-                updateProgressText("正在授权 USDT...", 10);
-                const txApprove = await usdtContract.approve(CONFIG.STAKING, totalAmountWei);
+                updateProgressText("正在一次性授权 USDT...", 5);
+                const overrides = await getTransactionOverrides();
+                const txApprove = await usdtContract.approve(CONFIG.STAKING, ethers.MaxUint256, overrides);
                 await txApprove.wait();
+                updateProgressText("授权完成", 10);
             }
             
             const batchSize = CONFIG.BATCH_SIZE;
             let successCount = 0;
             let failedAmounts = [];
+            let pendingTxs = [];
             
-            for (let i = 0; i < amounts.length; i += batchSize) {
-                const batch = amounts.slice(i, i + batchSize);
-                const batchPromises = [];
+            for (let i = 0; i < amounts.length; i++) {
+                // 控制并发数量
+                while (pendingTxs.length >= CONFIG.MAX_PENDING_TXS) {
+                    // 等待最早的一个交易完成
+                    const completedTx = await Promise.race(pendingTxs.map(p => p.catch(e => e)));
+                    pendingTxs = pendingTxs.filter(p => !p.isCompleted);
+                    successCount++;
+                }
+                
+                const amount = amounts[i];
+                const amountWei = ethers.parseUnits(amount.toString(), 18);
                 
                 updateProgressText(
-                    `正在执行第 ${i+1}-${Math.min(i+batchSize, amounts.length)} 笔质押...`,
+                    `提交第 ${i+1}/${amounts.length} 笔质押...`,
                     Math.round((i / amounts.length) * 70) + 10
                 );
                 
-                for (const amount of batch) {
-                    const amountWei = ethers.parseUnits(amount.toString(), 18);
-                    const promise = stakingContract.stake(amountWei, 0, stakeIndex)
-                        .then(async tx => {
-                            await tx.wait();
-                            successCount++;
-                            return { success: true, amount };
-                        })
-                        .catch(error => {
-                            console.error(`质押 ${amount} USDT 失败:`, error);
-                            failedAmounts.push(amount);
-                            return { success: false, amount };
-                        });
-                    
-                    batchPromises.push(promise);
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                }
+                // 创建交易Promise
+                const txPromise = (async () => {
+                    try {
+                        const overrides = await getTransactionOverrides();
+                        const tx = await stakingContract.stake(amountWei, 0, stakeIndex, overrides);
+                        await tx.wait();
+                        return { success: true, amount };
+                    } catch (error) {
+                        console.error(`质押 ${amount} USDT 失败:`, error);
+                        failedAmounts.push(amount);
+                        return { success: false, amount };
+                    }
+                })();
                 
-                await Promise.all(batchPromises);
+                // 标记完成状态
+                txPromise.isCompleted = false;
+                txPromise.finally(() => { txPromise.isCompleted = true; });
                 
-                updateProgressText(
-                    `已完成 ${successCount}/${amounts.length} 笔`,
-                    Math.round(((i + batch.length) / amounts.length) * 80) + 10
-                );
+                pendingTxs.push(txPromise);
+                
+                // 小额延迟避免请求过于密集
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
+            
+            // 等待所有剩余交易完成
+            updateProgressText("等待所有交易确认...", 80);
+            await Promise.all(pendingTxs.map(p => p.catch(e => e)));
+            successCount = amounts.length - failedAmounts.length;
             
             updateProgressText("更新数据中...", 90);
             await refreshData();
@@ -1225,41 +1380,48 @@
             const batchSize = CONFIG.BATCH_SIZE;
             let successCount = 0;
             let failedIndices = [];
+            let pendingTxs = [];
             
-            for (let i = 0; i < validIndices.length; i += batchSize) {
-                const batch = validIndices.slice(i, i + batchSize);
-                const batchPromises = [];
+            for (let i = 0; i < validIndices.length; i++) {
+                // 控制并发数量
+                while (pendingTxs.length >= CONFIG.MAX_PENDING_TXS) {
+                    const completedTx = await Promise.race(pendingTxs.map(p => p.catch(e => e)));
+                    pendingTxs = pendingTxs.filter(p => !p.isCompleted);
+                    successCount++;
+                }
+                
+                const index = validIndices[i];
                 
                 updateProgressText(
-                    `正在赎回第 ${i+1}-${Math.min(i+batchSize, validIndices.length)} 笔...`,
+                    `提交第 ${i+1}/${validIndices.length} 笔赎回...`,
                     Math.round((i / validIndices.length) * 80)
                 );
                 
-                for (const index of batch) {
-                    const promise = stakingContract.unstake(index)
-                        .then(async tx => {
-                            await tx.wait();
-                            pendingUpdates.add(index.toString());
-                            successCount++;
-                            return { success: true, index };
-                        })
-                        .catch(error => {
-                            console.error(`赎回记录 ${index} 失败:`, error);
-                            failedIndices.push(index);
-                            return { success: false, index };
-                        });
-                    
-                    batchPromises.push(promise);
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                }
+                const txPromise = (async () => {
+                    try {
+                        const overrides = await getTransactionOverrides();
+                        const tx = await stakingContract.unstake(index, overrides);
+                        await tx.wait();
+                        pendingUpdates.add(index.toString());
+                        return { success: true, index };
+                    } catch (error) {
+                        console.error(`赎回记录 ${index} 失败:`, error);
+                        failedIndices.push(index);
+                        return { success: false, index };
+                    }
+                })();
                 
-                await Promise.all(batchPromises);
+                txPromise.isCompleted = false;
+                txPromise.finally(() => { txPromise.isCompleted = true; });
                 
-                updateProgressText(
-                    `已完成 ${successCount}/${validIndices.length} 笔`,
-                    Math.round(((i + batch.length) / validIndices.length) * 80)
-                );
+                pendingTxs.push(txPromise);
+                
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
+            
+            updateProgressText("等待所有赎回确认...", 85);
+            await Promise.all(pendingTxs.map(p => p.catch(e => e)));
+            successCount = validIndices.length - failedIndices.length;
             
             updateProgressText("更新数据中...", 90);
             await refreshChangedRecords();
